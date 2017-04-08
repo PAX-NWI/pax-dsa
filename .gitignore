@@ -1,7 +1,10 @@
 .gradle/
 .idea/
 .eclipse/
+.settings/
 build/
+.project
+.classpath
 
 # Ignore Gradle GUI config
 gradle-app.setting
