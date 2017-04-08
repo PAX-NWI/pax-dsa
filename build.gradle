@@ -22,7 +22,7 @@ jar {
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.25'
     compile 'org.slf4j:slf4j-simple:1.7.25'
-	compile 'org.igniterealtime.smack:smack:4.2.0'
+	compile 'org.igniterealtime.smack:smack-core:4.2.0'
 
     testCompile 'junit:junit:4.12'
 }
