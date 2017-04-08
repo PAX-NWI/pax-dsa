@@ -10,5 +10,6 @@ public class HelloWorld {
     public static void main(String[] args) {
         Logger logger = LoggerFactory.getLogger(HelloWorld.class);
         logger.info("Hello World!");
+        logger.info("Hallo Sascha");
     }
 }
