@@ -21,15 +21,17 @@ public class XmppManager {
     private ChatManager chatManager;
 	private MessageListener messageListener;
 
-	public XmppManager(String server, int port, String username, String password) throws XMPPException, IOException, InterruptedException, SmackException  {
-        logger.debug("Initializing connection to server {} port {}", server, port);
+	public XmppManager(String server, String username, String password) throws XMPPException, IOException, InterruptedException, SmackException  {
+        logger.debug("Initializing connection to server {}", server);
         SmackConfiguration.DEBUG = true;
 
-        XMPPTCPConnectionConfiguration.Builder configBuilder = XMPPTCPConnectionConfiguration.builder();
-        configBuilder.setXmppDomain(server);
-        configBuilder.setUsernameAndPassword(username, password);
+        XMPPTCPConnectionConfiguration configuration = XMPPTCPConnectionConfiguration.builder()
+                .setXmppDomain(server)
+                .setResource("SomeResource")
+                .setUsernameAndPassword(username, password)
+                .build();
 
-        connection = new XMPPTCPConnection(configBuilder.build());
+        connection = new XMPPTCPConnection(configuration);
 
         connection.connect();
 
