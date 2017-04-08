@@ -1,108 +1,47 @@
 package de.pax.dsa.xmpp;
 
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.ChatManager;
-import org.jivesoftware.smack.ConnectionConfiguration;
-import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.Roster;
-import org.jivesoftware.smack.SASLAuthentication;
-import org.jivesoftware.smack.SmackConfiguration;
-import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.ConnectionConfiguration.SecurityMode;
-import org.jivesoftware.smack.packet.Message;
-import org.jivesoftware.smack.packet.Presence;
-import org.jivesoftware.smack.packet.Presence.Type;
+
+import org.jivesoftware.smack.*;
+import org.jivesoftware.smack.chat2.Chat;
+import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.tcp.XMPPTCPConnection;
+import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
+import org.jxmpp.jid.EntityBareJid;
+import org.jxmpp.jid.impl.JidCreate;
+import org.jxmpp.stringprep.XmppStringprepException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
 
 public class XmppManager {
+    private static Logger logger = LoggerFactory.getLogger(XmppManager.class);
 
-	private static final int packetReplyTimeout = 50000; // millis
-
-	private String server;
-	private int port;
-
-	private ConnectionConfiguration config;
-	private XMPPConnection connection;
-
-	private ChatManager chatManager;
+    private AbstractXMPPConnection connection;
+    private ChatManager chatManager;
 	private MessageListener messageListener;
 
-	public XmppManager(String server, int port) {
-		this.server = server;
-		this.port = port;
+	public XmppManager(String server, int port, String username, String password) throws XMPPException, IOException, InterruptedException, SmackException  {
+        logger.debug("Initializing connection to server {} port {}", server, port);
+        SmackConfiguration.DEBUG = true;
+
+        XMPPTCPConnectionConfiguration.Builder configBuilder = XMPPTCPConnectionConfiguration.builder();
+        configBuilder.setXmppDomain(server);
+        configBuilder.setUsernameAndPassword(username, password);
+
+        connection = new XMPPTCPConnection(configBuilder.build());
+
+        connection.connect();
+
+        logger.debug("Connected: {}", connection.isConnected());
+
+        chatManager = ChatManager.getInstanceFor(connection);
 	}
 
-	public void init() throws XMPPException {
-
-		System.out.println(String.format("Initializing connection to server %1$s port %2$d", server, port));
-
-		System.setProperty("smack.debugEnabled", "true");
-		XMPPConnection.DEBUG_ENABLED = true;
-		
-		SmackConfiguration.setPacketReplyTimeout(packetReplyTimeout);
-
-		config = new ConnectionConfiguration(server);
-		config.setSASLAuthenticationEnabled(false);
-		config.setSecurityMode(SecurityMode.disabled);
-
-		connection = new XMPPConnection(config);
-		
-		
-		
-		SASLAuthentication.supportSASLMechanism("PLAIN",0);
-		
-		connection.connect();
-
-		System.out.println("Connected: " + connection.isConnected());
-
-		chatManager = connection.getChatManager();
-		messageListener = new MyMessageListener();
-
+	public void sendMessage(String message, String buddyJID) throws XMPPException, XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
+        logger.debug("Sending mesage '{}' to user {}", message, buddyJID);
+        EntityBareJid jid = JidCreate.entityBareFrom(buddyJID);
+        Chat chat = chatManager.chatWith(jid);
+        chat.send(message);
 	}
-
-	public void performLogin(String username, String password) throws XMPPException {
-		if (connection != null && connection.isConnected()) {
-			connection.login(username, password);
-		}
-	}
-
-	public void setStatus(boolean available, String status) {
-
-		Presence.Type type = available ? Type.available : Type.unavailable;
-		Presence presence = new Presence(type);
-
-		presence.setStatus(status);
-		connection.sendPacket(presence);
-
-	}
-
-	public void destroy() {
-		if (connection != null && connection.isConnected()) {
-			connection.disconnect();
-		}
-	}
-
-	public void sendMessage(String message, String buddyJID) throws XMPPException {
-		System.out.println(String.format("Sending mesage '%1$s' to user %2$s", message, buddyJID));
-		Chat chat = chatManager.createChat(buddyJID, messageListener);
-		chat.sendMessage(message);
-	}
-
-	public void createEntry(String user, String name) throws Exception {
-		System.out.println(String.format("Creating entry for buddy '%1$s' with name %2$s", user, name));
-		Roster roster = connection.getRoster();
-		roster.createEntry(user, name, null);
-	}
-
-	class MyMessageListener implements MessageListener {
-
-		@Override
-		public void processMessage(Chat chat, Message message) {
-			String from = message.getFrom();
-			String body = message.getBody();
-			System.out.println(String.format("Received message '%1$s' from %2$s", body, from));
-		}
-
-	}
-
 }
