@@ -1,4 +1,4 @@
-package de.pax.dsa.ui;
+package de.pax.dsa.ui.demoapplications;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;

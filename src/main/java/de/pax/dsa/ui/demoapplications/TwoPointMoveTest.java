@@ -1,4 +1,4 @@
-package de.pax.dsa.ui;
+package de.pax.dsa.ui.demoapplications;
 
 import de.pax.dsa.ui.internal.Anchor;
 import de.pax.dsa.ui.internal.MoveCenter;
