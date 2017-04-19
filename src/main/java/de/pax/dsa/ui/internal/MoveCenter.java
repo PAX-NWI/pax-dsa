@@ -20,7 +20,7 @@ public class MoveCenter extends Transition {
 		yDistance = toY - startY;
 		xDistance = toX - startX;
 		
-		setCycleDuration(Duration.seconds(2));
+		setCycleDuration(Duration.seconds(1));
 	}
 
 	@Override

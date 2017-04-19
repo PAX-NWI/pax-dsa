@@ -1,7 +1,7 @@
 package de.pax.dsa.ui;
 
-import de.pax.dsa.ui.BoundsPlayground.Delta;
 import de.pax.dsa.ui.internal.Anchor;
+import de.pax.dsa.ui.internal.MoveCenter;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -32,22 +32,15 @@ public class TwoPointMoveTest extends Application {
 		final Anchor anchor1 = new Anchor("Anchor 1", line.startXProperty(), line.startYProperty());
 		final Anchor anchor2 = new Anchor("Anchor 2", line.endXProperty(), line.endYProperty());
 
-
-		enableDrag(anchor1);
+		//enableDrag(anchor1);
 		enableDrag(anchor2);
 		Button button = new Button("Do Move");
-		
-		
-		
-		
+
 		button.setOnAction(e -> {
-		
-			anchor1.setCenterX(anchor2.getCenterX());
-			anchor1.setCenterY(anchor2.getCenterY());
+			moveTo(anchor1, anchor2);
 		});
 
-		final Group group = new Group(line, anchor1, anchor2,button);
-		
+		final Group group = new Group(line, anchor1, anchor2, button);
 
 		// layout the scene.
 		final StackPane background = new StackPane();
@@ -58,6 +51,11 @@ public class TwoPointMoveTest extends Application {
 		stage.setScene(scene);
 		stage.show();
 
+	}
+
+	private void moveTo(Anchor anchor1, Anchor anchor2) {
+		MoveCenter move = new MoveCenter(anchor1, anchor2.getCenterX(), anchor2.getCenterY());
+		move.play();
 	}
 
 	// records relative x and y co-ordinates.
