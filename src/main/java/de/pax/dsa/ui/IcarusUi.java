@@ -20,14 +20,13 @@ public class IcarusUi extends Application {
 		TwoStageMoveNode nodeA = new TwoStageMoveNode(150, 150);
 		TwoStageMoveNode nodeB = new TwoStageMoveNode(300, 300);
 
-		Button button = new Button("Do Moves");
-
-		button.setOnAction(e -> {
+		Button move = new Button("Do Moves");
+		move.setOnAction(e -> {
 			nodeA.commitMove();
 			nodeB.commitMove();
 		});
 
-		final Group group = new Group(nodeA, nodeB, button);
+		final Group group = new Group(nodeA, nodeB, move);
 
 		// layout the scene.
 		final StackPane background = new StackPane();

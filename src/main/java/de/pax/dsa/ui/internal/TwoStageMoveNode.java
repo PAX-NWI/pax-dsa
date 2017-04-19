@@ -28,6 +28,11 @@ public class TwoStageMoveNode extends Group {
 
 	}
 
+	public void setMoveTarget(double x, double y) {
+		moveTarget.setCenterX(x);
+		moveTarget.setCenterY(y);
+	}
+
 	public void commitMove() {
 		MoveCenterTransition move = new MoveCenterTransition(position, moveTarget.getCenterX(),
 				moveTarget.getCenterY());
