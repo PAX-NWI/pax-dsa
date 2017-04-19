@@ -1,5 +1,6 @@
 package de.pax.dsa.ui.internal;
 
+import javafx.animation.Interpolator;
 import javafx.animation.Transition;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
@@ -21,9 +22,13 @@ public class MoveCenterTransition extends Transition {
 		yDistance = toY - startY;
 		xDistance = toX - startX;
 
-		double dist = (Math.abs(xDistance) + Math.abs(yDistance))/2;
+		double dist = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
+
+		System.out.println(circle.getId() +" "+ dist * SPEED_FACTOR);
 
 		setCycleDuration(Duration.millis(dist * SPEED_FACTOR));
+		
+		setInterpolator(Interpolator.LINEAR);
 	}
 
 	@Override

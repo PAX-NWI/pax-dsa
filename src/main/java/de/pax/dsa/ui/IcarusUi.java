@@ -17,8 +17,11 @@ public class IcarusUi extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		TwoStageMoveNode nodeA = new TwoStageMoveNode(150, 150);
-		TwoStageMoveNode nodeB = new TwoStageMoveNode(300, 300);
+		TwoStageMoveNode nodeA = new TwoStageMoveNode("nodeA", 100, 100);
+		TwoStageMoveNode nodeB = new TwoStageMoveNode("nodeB", 200, 100);
+
+		nodeA.setMoveTarget(100, 300);
+		nodeB.setMoveTarget(200, 500);
 
 		Button move = new Button("Do Moves");
 		move.setOnAction(e -> {
@@ -31,7 +34,7 @@ public class IcarusUi extends Application {
 		// layout the scene.
 		final StackPane background = new StackPane();
 		background.setStyle("-fx-background-color: cornsilk;");
-		final Scene scene = new Scene(new Group(background, group), 600, 500);
+		final Scene scene = new Scene(new Group(background, group), 600, 700);
 		background.prefHeightProperty().bind(scene.heightProperty());
 		background.prefWidthProperty().bind(scene.widthProperty());
 		stage.setScene(scene);

@@ -12,15 +12,15 @@ public class TwoStageMoveNode extends Group {
 	private Anchor position;
 	private Anchor moveTarget;
 
-	public TwoStageMoveNode(double x, double y) {
+	public TwoStageMoveNode(String string, double x, double y) {
 		Line line = new Line(x, y, x, y);
 		line.setId("Line");
 		line.setStrokeLineCap(StrokeLineCap.ROUND);
 		line.setStroke(Color.MIDNIGHTBLUE);
 		line.setStrokeWidth(5);
 
-		position = new Anchor("Anchor 1", line.startXProperty(), line.startYProperty());
-		moveTarget = new Anchor("Anchor 2", line.endXProperty(), line.endYProperty());
+		position = new Anchor(string, line.startXProperty(), line.startYProperty());
+		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
 
 		enableDrag(moveTarget);
 
