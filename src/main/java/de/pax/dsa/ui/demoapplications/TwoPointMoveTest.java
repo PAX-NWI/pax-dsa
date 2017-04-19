@@ -1,7 +1,7 @@
 package de.pax.dsa.ui.demoapplications;
 
 import de.pax.dsa.ui.internal.Anchor;
-import de.pax.dsa.ui.internal.MoveCenter;
+import de.pax.dsa.ui.internal.MoveCenterTransition;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -29,23 +29,25 @@ public class TwoPointMoveTest extends Application {
 		line.setStroke(Color.MIDNIGHTBLUE);
 		line.setStrokeWidth(5);
 
-		final Anchor anchor1 = new Anchor("Anchor 1", line.startXProperty(), line.startYProperty());
-		final Anchor anchor2 = new Anchor("Anchor 2", line.endXProperty(), line.endYProperty());
+		final Anchor position = new Anchor("Position", line.startXProperty(), line.startYProperty());
+		final Anchor moveTarget = new Anchor("Move Target", line.endXProperty(), line.endYProperty());
 
-		//enableDrag(anchor1);
-		enableDrag(anchor2);
+		enableDrag(moveTarget);
 		Button button = new Button("Do Move");
 
 		button.setOnAction(e -> {
-			moveTo(anchor1, anchor2);
+			moveTo(position, moveTarget);
 		});
 
-		final Group group = new Group(line, anchor1, anchor2, button);
+		final Group group = new Group(line, position, moveTarget, button);
 
+		final Group group2 = new Group(group);
+		
+		
 		// layout the scene.
 		final StackPane background = new StackPane();
 		background.setStyle("-fx-background-color: cornsilk;");
-		final Scene scene = new Scene(new Group(background, group), 600, 500);
+		final Scene scene = new Scene(new Group(background, group2), 600, 500);
 		background.prefHeightProperty().bind(scene.heightProperty());
 		background.prefWidthProperty().bind(scene.widthProperty());
 		stage.setScene(scene);
@@ -54,7 +56,7 @@ public class TwoPointMoveTest extends Application {
 	}
 
 	private void moveTo(Anchor anchor1, Anchor anchor2) {
-		MoveCenter move = new MoveCenter(anchor1, anchor2.getCenterX(), anchor2.getCenterY());
+		MoveCenterTransition move = new MoveCenterTransition(anchor1, anchor2.getCenterX(), anchor2.getCenterY());
 		move.play();
 	}
 

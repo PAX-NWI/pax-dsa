@@ -4,7 +4,7 @@ import javafx.animation.Transition;
 import javafx.scene.shape.Circle;
 import javafx.util.Duration;
 
-public class MoveCenter extends Transition {
+public class MoveCenterTransition extends Transition {
 
 	private Circle circle;
 	private double yDistance;
@@ -12,7 +12,7 @@ public class MoveCenter extends Transition {
 	private double startX;
 	private double startY;
 
-	public MoveCenter(Circle circle, double toX, double toY) {
+	public MoveCenterTransition(Circle circle, double toX, double toY) {
 		this.circle = circle;
 		startX = circle.getCenterX();
 		startY = circle.getCenterY();
