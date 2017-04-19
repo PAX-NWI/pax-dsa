@@ -6,6 +6,7 @@ import javafx.util.Duration;
 
 public class MoveCenterTransition extends Transition {
 
+	private static final int SPEED_FACTOR = 5;
 	private Circle circle;
 	private double yDistance;
 	private double xDistance;
@@ -19,8 +20,10 @@ public class MoveCenterTransition extends Transition {
 
 		yDistance = toY - startY;
 		xDistance = toX - startX;
-		
-		setCycleDuration(Duration.seconds(1));
+
+		double dist = (Math.abs(xDistance) + Math.abs(yDistance))/2;
+
+		setCycleDuration(Duration.millis(dist * SPEED_FACTOR));
 	}
 
 	@Override

@@ -17,15 +17,17 @@ public class IcarusUi extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		TwoStageMoveNode twoStageMoveNode = new TwoStageMoveNode(150,150);
-	
-		Button button = new Button("Do Move");
+		TwoStageMoveNode nodeA = new TwoStageMoveNode(150, 150);
+		TwoStageMoveNode nodeB = new TwoStageMoveNode(300, 300);
+
+		Button button = new Button("Do Moves");
 
 		button.setOnAction(e -> {
-			twoStageMoveNode.commitMove();
+			nodeA.commitMove();
+			nodeB.commitMove();
 		});
 
-		final Group group = new Group(twoStageMoveNode,button);
+		final Group group = new Group(nodeA, nodeB, button);
 
 		// layout the scene.
 		final StackPane background = new StackPane();
@@ -36,6 +38,6 @@ public class IcarusUi extends Application {
 		stage.setScene(scene);
 		stage.show();
 
-	}	
+	}
 
 }
