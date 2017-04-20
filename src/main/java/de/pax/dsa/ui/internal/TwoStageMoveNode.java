@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
+import javafx.scene.shape.StrokeType;
 
 public class TwoStageMoveNode extends Group {
 
@@ -20,13 +21,16 @@ public class TwoStageMoveNode extends Group {
 	public TwoStageMoveNode(String string, double x, double y) {
 		Line line = new Line(x, y, x, y);
 		line.setStrokeLineCap(StrokeLineCap.ROUND);
-		line.setStroke(Color.MIDNIGHTBLUE);
+		line.setStroke(Color.CORNFLOWERBLUE);
 		line.setStrokeWidth(5);
 
 		position = new Anchor("position", line.startXProperty(), line.startYProperty());
 		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
 		moveTarget.setFill(Color.ALICEBLUE.deriveColor(1, 1, 1, 0.5));
 
+		moveTarget.getStrokeDashArray().addAll(2d,20d);
+		
+		
 		enableDrag(moveTarget);
 
 		getChildren().addAll(line, position, moveTarget);
@@ -35,6 +39,9 @@ public class TwoStageMoveNode extends Group {
 	}
 
 	public void setMoveTarget(double x, double y) {
+		MoveCenterTransition move = new MoveCenterTransition(moveTarget, x, y);
+		move.play();
+
 		moveTarget.setCenterX(x);
 		moveTarget.setCenterY(y);
 	}
