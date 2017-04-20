@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import de.pax.dsa.connection.Session;
+import de.pax.dsa.connection.IIcarusSession;
+import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.ui.internal.TwoStageMoveNode;
 import javafx.application.Application;
 import javafx.scene.Group;
@@ -29,7 +30,7 @@ public class IcarusUi extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		Session session = new Session();
+		IIcarusSession session = new MockSessionImpl();
 
 		session.connect("user", "password");
 

@@ -1,4 +1,4 @@
-package de.pax.dsa.connection;
+package de.pax.dsa.model;
 
 public class PositionUpdate {
 

@@ -2,7 +2,7 @@ package de.pax.dsa.ui.internal;
 
 import java.util.function.Consumer;
 
-import de.pax.dsa.connection.PositionUpdate;
+import de.pax.dsa.model.PositionUpdate;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
