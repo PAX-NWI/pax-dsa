@@ -1,5 +1,8 @@
 package de.pax.dsa.ui.internal;
 
+import java.util.function.Consumer;
+
+import de.pax.dsa.connection.PositionUpdate;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -11,21 +14,24 @@ public class TwoStageMoveNode extends Group {
 
 	private Anchor position;
 	private Anchor moveTarget;
+	private Consumer<PositionUpdate> targetChangedConsumer = t -> {
+	};
 
 	public TwoStageMoveNode(String string, double x, double y) {
 		Line line = new Line(x, y, x, y);
-		line.setId("Line");
 		line.setStrokeLineCap(StrokeLineCap.ROUND);
 		line.setStroke(Color.MIDNIGHTBLUE);
 		line.setStrokeWidth(5);
 
-		position = new Anchor(string, line.startXProperty(), line.startYProperty());
+		position = new Anchor("position", line.startXProperty(), line.startYProperty());
 		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
+		moveTarget.setFill(Color.ALICEBLUE.deriveColor(1, 1, 1, 0.5));
 
 		enableDrag(moveTarget);
 
 		getChildren().addAll(line, position, moveTarget);
 
+		setId(string);
 	}
 
 	public void setMoveTarget(double x, double y) {
@@ -52,7 +58,10 @@ public class TwoStageMoveNode extends Group {
 			dragDelta.y = circle.getCenterY() - mouseEvent.getY();
 			circle.getScene().setCursor(Cursor.MOVE);
 		});
-		circle.setOnMouseReleased(mouseEvent -> circle.getScene().setCursor(Cursor.HAND));
+		circle.setOnMouseReleased(mouseEvent -> {
+			defineMove(circle);
+			circle.getScene().setCursor(Cursor.HAND);
+		});
 		circle.setOnMouseDragged(mouseEvent -> {
 			circle.setCenterX(mouseEvent.getX() + dragDelta.x);
 			circle.setCenterY(mouseEvent.getY() + dragDelta.y);
@@ -67,6 +76,14 @@ public class TwoStageMoveNode extends Group {
 				circle.getScene().setCursor(Cursor.DEFAULT);
 			}
 		});
+	}
+
+	private void defineMove(final Circle circle) {
+		targetChangedConsumer.accept(new PositionUpdate(this.getId(), circle.getCenterX(), circle.getCenterY()));
+	}
+
+	public void onTargetChanged(Consumer<PositionUpdate> targetChangedConsumer) {
+		this.targetChangedConsumer = targetChangedConsumer;
 	}
 
 }

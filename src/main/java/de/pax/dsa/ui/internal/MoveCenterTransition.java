@@ -24,8 +24,6 @@ public class MoveCenterTransition extends Transition {
 
 		double dist = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
 
-		System.out.println(circle.getId() +" "+ dist * SPEED_FACTOR);
-
 		setCycleDuration(Duration.millis(dist * SPEED_FACTOR));
 		
 		setInterpolator(Interpolator.LINEAR);
