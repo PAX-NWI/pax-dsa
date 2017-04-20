@@ -23,14 +23,15 @@ public class TwoStageMoveNode extends Group {
 		line.setStrokeLineCap(StrokeLineCap.ROUND);
 		line.setStroke(Color.CORNFLOWERBLUE);
 		line.setStrokeWidth(5);
+		line.setMouseTransparent(true);
 
 		position = new Anchor("position", line.startXProperty(), line.startYProperty());
 		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
-		moveTarget.setFill(Color.ALICEBLUE.deriveColor(1, 1, 1, 0.5));
+		moveTarget.setFill(Color.TRANSPARENT);
 
 		moveTarget.getStrokeDashArray().addAll(2d,20d);
 		
-		
+		position.setMouseTransparent(true);
 		enableDrag(moveTarget);
 
 		getChildren().addAll(line, position, moveTarget);
