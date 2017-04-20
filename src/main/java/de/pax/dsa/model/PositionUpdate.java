@@ -2,11 +2,6 @@ package de.pax.dsa.model;
 
 public class PositionUpdate {
 
-	@Override
-	public String toString() {
-		return "PositionUpdate [id=" + id + ", x=" + x + ", y=" + y + "]";
-	}
-
 	private String id;
 	private double x;
 	private double y;
@@ -41,4 +36,8 @@ public class PositionUpdate {
 		this.y = y;
 	}
 
+	@Override
+	public String toString() {
+		return "PositionUpdate [id=" + id + ", x=" + x + ", y=" + y + "]";
+	}
 }

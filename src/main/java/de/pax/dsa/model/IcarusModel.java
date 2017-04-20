@@ -10,7 +10,7 @@ public class IcarusModel {
 
 	public IcarusModel() {
 		turns = new ArrayList<>();
-		setCharacters(new ArrayList<>());
+		characters = new ArrayList<>();
 	}
 
 	public List<Turn> getTurns() {
