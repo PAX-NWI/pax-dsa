@@ -1,6 +1,7 @@
 package de.pax.dsa.ui;
 
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -8,15 +9,19 @@ import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.MockSessionImpl;
+import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
+import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class IcarusUi extends Application {
@@ -29,6 +34,32 @@ public class IcarusUi extends Application {
 		launch(args);
 	}
 
+	public Canvas createGrid(int offset) {
+
+		double w = 4000;// getBoundsInLocal().getWidth();
+		double h = 4000;// getBoundsInLocal().getHeight();
+
+		// add grid
+		Canvas grid = new Canvas(w, h);
+
+		// don't catch mouse events
+		grid.setMouseTransparent(true);
+
+		GraphicsContext gc = grid.getGraphicsContext2D();
+
+		gc.setStroke(Color.LIGHTGRAY);
+		gc.setLineWidth(1);
+
+		// draw grid lines
+		for (double i = offset; i < w; i += offset) {
+			gc.strokeLine(i, 0, i, h);
+			gc.strokeLine(0, i, w, i);
+		}
+
+		grid.toBack();
+		return grid;
+	}
+
 	@Override
 	public void start(Stage stage) throws Exception {
 
@@ -36,23 +67,17 @@ public class IcarusUi extends Application {
 
 		session.connect("user", "password");
 
+		// Grid grid = new Grid(50);
 		TwoStageMoveNode nodeA = new TwoStageMoveNode("nodeA", 100, 100);
 		nodeA.setMoveTarget(100, 300);
 		TwoStageMoveNode nodeB = new TwoStageMoveNode("nodeB", 200, 100);
 		nodeB.setMoveTarget(200, 500);
-		ImageNode img = new ImageNode("file:src/main/resources/festum.png",300,200);
-	
- 
-		DragEnabler.enableDrag(nodeA, positionUpdate -> {
-			session.sendPositionUpdate(positionUpdate);
-		});
-		DragEnabler.enableDrag(nodeB, positionUpdate -> {
-			session.sendPositionUpdate(positionUpdate);
-		});
-		DragEnabler.enableDrag(img, positionUpdate -> {
-			session.sendPositionUpdate(positionUpdate);
-		});
+		ImageNode img = new ImageNode("file:src/main/resources/festum.png", 300, 200);
 
+		Consumer<PositionUpdate> onDragComplete = session::sendPositionUpdate;
+		DragEnabler.enableDrag(nodeA, onDragComplete);
+		DragEnabler.enableDrag(nodeB, onDragComplete);
+		DragEnabler.enableDrag(img, onDragComplete);
 
 		Button move = new Button("Do Moves");
 		move.setOnAction(e -> {
@@ -60,31 +85,40 @@ public class IcarusUi extends Application {
 			nodeB.commitMove();
 		});
 
-		group = new Group(nodeA, nodeB, move, img);
+		group = new Group(img, nodeA, nodeB, move);
 
 		session.onPositionUpdate(positionUpdate -> {
-			Node node = getFromGroup(positionUpdate.getId(), group);
-			logger.info("received " + positionUpdate +" for " + node.getId());
-		//	node.setMoveTarget(positionUpdate.getX(), positionUpdate.getY());
+			I2DObject node = getFromGroup(positionUpdate.getId(), group);
+			logger.info("received " + positionUpdate);
+			node.setX(positionUpdate.getX());
+			node.setY(positionUpdate.getY());
 		});
 
 		// layout the scene.
-		final StackPane background = new StackPane();
-		background.setStyle("-fx-background-color: cornsilk;");
-		final Scene scene = new Scene(new Group(background, group), 1000, 800);
-		background.prefHeightProperty().bind(scene.heightProperty());
-		background.prefWidthProperty().bind(scene.widthProperty());
+		// final StackPane background = new StackPane();
+		// background.setStyle("-fx-background-color: cornsilk;");
+		Canvas grid = createGrid(50);
+		grid.setStyle("-fx-background-color: cornsilk;");
+		Group root = new Group(group, grid);
+		final Scene scene = new Scene(root, 1000, 800);
+
+		grid.widthProperty().bind(scene.widthProperty()); // does not really
+															// work :(
+		grid.heightProperty().bind(scene.heightProperty());
+
+		// background.prefHeightProperty().bind(scene.heightProperty());
+		// background.prefWidthProperty().bind(scene.widthProperty());
 		stage.setScene(scene);
 		stage.show();
 	}
 
-	private Node getFromGroup(String id, Group group) {
+	private I2DObject getFromGroup(String id, Group group) {
 		List<Node> collect = group.getChildren().stream().filter(e -> id.equals(e.getId()))
 				.collect(Collectors.toList());
 		if (collect.size() != 1) {
 			throw new IllegalStateException("ID: " + id + "exists not exactly once (" + collect.size() + " times)");
 		} else {
-			return collect.get(0);
+			return (I2DObject) collect.get(0);
 		}
 	}
 
