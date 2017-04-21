@@ -28,10 +28,11 @@ public class TwoStageMoveNode extends Group {
 		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
 		moveTarget.setFill(Color.TRANSPARENT);
 
-		moveTarget.getStrokeDashArray().addAll(2d,20d);
-		
+		moveTarget.getStrokeDashArray().addAll(2d, 20d);
+
 		position.setMouseTransparent(true);
-		enableDrag(moveTarget);
+
+		DragEnabler.enableDrag(moveTarget, targetChangedConsumer);
 
 		getChildren().addAll(line, position, moveTarget);
 
@@ -41,52 +42,12 @@ public class TwoStageMoveNode extends Group {
 	public void setMoveTarget(double x, double y) {
 		MoveCenterTransition move = new MoveCenterTransition(moveTarget, x, y);
 		move.play();
-
-		moveTarget.setCenterX(x);
-		moveTarget.setCenterY(y);
 	}
 
 	public void commitMove() {
 		MoveCenterTransition move = new MoveCenterTransition(position, moveTarget.getCenterX(),
 				moveTarget.getCenterY());
 		move.play();
-	}
-
-	class Delta {
-		double x, y;
-	}
-
-	// make a node movable by dragging it around with the mouse.
-	private void enableDrag(final Circle circle) {
-		final Delta dragDelta = new Delta();
-		circle.setOnMousePressed(mouseEvent -> {
-			// record a delta distance for the drag and drop operation.
-			dragDelta.x = circle.getCenterX() - mouseEvent.getX();
-			dragDelta.y = circle.getCenterY() - mouseEvent.getY();
-			circle.getScene().setCursor(Cursor.MOVE);
-		});
-		circle.setOnMouseReleased(mouseEvent -> {
-			defineMove(circle);
-			circle.getScene().setCursor(Cursor.HAND);
-		});
-		circle.setOnMouseDragged(mouseEvent -> {
-			circle.setCenterX(mouseEvent.getX() + dragDelta.x);
-			circle.setCenterY(mouseEvent.getY() + dragDelta.y);
-		});
-		circle.setOnMouseEntered(mouseEvent -> {
-			if (!mouseEvent.isPrimaryButtonDown()) {
-				circle.getScene().setCursor(Cursor.HAND);
-			}
-		});
-		circle.setOnMouseExited(mouseEvent -> {
-			if (!mouseEvent.isPrimaryButtonDown()) {
-				circle.getScene().setCursor(Cursor.DEFAULT);
-			}
-		});
-	}
-
-	private void defineMove(final Circle circle) {
-		targetChangedConsumer.accept(new PositionUpdate(this.getId(), circle.getCenterX(), circle.getCenterY()));
 	}
 
 	public void onTargetChanged(Consumer<PositionUpdate> targetChangedConsumer) {
