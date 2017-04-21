@@ -5,13 +5,11 @@ import java.util.function.Consumer;
 import de.pax.dsa.model.PositionUpdate;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
-import javafx.scene.image.ImageView;
-import javafx.scene.shape.Circle;
 
 public class DragEnabler {
 
 	public static void enableDrag(Node node, I2DObject i2dObject, Consumer<PositionUpdate> onDragComplete) {
-		
+
 		final Position dragDelta = new Position();
 		node.setOnMousePressed(mouseEvent -> {
 			// record a delta distance for the drag and drop operation.
@@ -40,61 +38,38 @@ public class DragEnabler {
 			}
 		});
 	}
-
-	public static void enableDrag(ImageView imageView, Consumer<PositionUpdate> onDragComplete) {
-		I2DObject i2dObject = new I2DObject() {
-
-			@Override
-			public double getX() {
-				return imageView.getX();
-			}
-
-			@Override
-			public double getY() {
-				return imageView.getY();
-			}
-
-			@Override
-			public void setY(double y) {
-				imageView.setY(y);
-			}
-
-			@Override
-			public void setX(double x) {
-				imageView.setX(x);
-			}
-
-		};
-		enableDrag(imageView, i2dObject, onDragComplete);
-
+	
+	public static void enableDrag(Node node, Consumer<PositionUpdate> onDragComplete) {
+		enableDrag(node, (I2DObject) node, onDragComplete);
 	}
 
-	public static void enableDrag(Circle cirlce, Consumer<PositionUpdate> onDragComplete) {
-		I2DObject i2dObject = new I2DObject() {
-
-			@Override
-			public double getX() {
-				return cirlce.getCenterX();
-			}
-
-			@Override
-			public double getY() {
-				return cirlce.getCenterY();
-			}
-
-			@Override
-			public void setY(double y) {
-				cirlce.setCenterY(y);
-			}
-
-			@Override
-			public void setX(double x) {
-				cirlce.setCenterX(x);
-			}
-
-		};
-		enableDrag(cirlce, i2dObject, onDragComplete);
-
-	}
+	// public static void enableDrag(ImageView imageView,
+	// Consumer<PositionUpdate> onDragComplete) {
+	// I2DObject i2dObject = new I2DObject() {
+	//
+	// @Override
+	// public double getX() {
+	// return imageView.getX();
+	// }
+	//
+	// @Override
+	// public double getY() {
+	// return imageView.getY();
+	// }
+	//
+	// @Override
+	// public void setY(double y) {
+	// imageView.setY(y);
+	// }
+	//
+	// @Override
+	// public void setX(double x) {
+	// imageView.setX(x);
+	// }
+	//
+	// };
+	// enableDrag(imageView, i2dObject, onDragComplete);
+	//
+	// }
 
 }

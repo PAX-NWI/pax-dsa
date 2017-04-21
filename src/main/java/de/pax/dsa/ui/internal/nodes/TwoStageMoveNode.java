@@ -1,21 +1,17 @@
 package de.pax.dsa.ui.internal.nodes;
 
-import java.util.function.Consumer;
-
-import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.ui.internal.animations.MoveCenterTransition;
-import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
+import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 
-public class TwoStageMoveNode extends Group {
+public class TwoStageMoveNode extends Group implements I2DObject {
 
 	private Anchor position;
 	private Anchor moveTarget;
-	private Consumer<PositionUpdate> targetChangedConsumer = t -> {
-	};
+
 
 	public TwoStageMoveNode(String string, double x, double y) {
 		Line line = new Line(x, y, x, y);
@@ -32,7 +28,7 @@ public class TwoStageMoveNode extends Group {
 
 		position.setMouseTransparent(true);
 
-		DragEnabler.enableDrag(moveTarget, targetChangedConsumer);
+		
 
 		getChildren().addAll(line, position, moveTarget);
 
@@ -50,8 +46,26 @@ public class TwoStageMoveNode extends Group {
 		move.play();
 	}
 
-	public void onTargetChanged(Consumer<PositionUpdate> targetChangedConsumer) {
-		this.targetChangedConsumer = targetChangedConsumer;
+
+	@Override
+	public double getX() {
+		return moveTarget.getCenterX();
+	}
+
+	@Override
+	public void setX(double x) {
+		moveTarget.setCenterX(x);
+	}
+
+	@Override
+	public double getY() {
+		return moveTarget.getCenterY();
+	}
+
+	@Override
+	public void setY(double y) {
+		moveTarget.setCenterY(y);
+		
 	}
 
 }

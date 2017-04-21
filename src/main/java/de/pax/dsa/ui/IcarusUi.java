@@ -9,14 +9,13 @@ import org.slf4j.LoggerFactory;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
+import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -38,25 +37,22 @@ public class IcarusUi extends Application {
 		session.connect("user", "password");
 
 		TwoStageMoveNode nodeA = new TwoStageMoveNode("nodeA", 100, 100);
-		TwoStageMoveNode nodeB = new TwoStageMoveNode("nodeB", 200, 100);
-
-		Image img = new Image("file:src/main/resources/festum.png");
-		ImageView iv = new ImageView(img);
-		iv.setId("image");
-		iv.setX(300);
-		iv.setY(200);
-
-		DragEnabler.enableDrag(iv, positionUpdate -> {
-			session.sendPositionUpdate(positionUpdate);
-		});
-
 		nodeA.setMoveTarget(100, 300);
-		nodeA.onTargetChanged(positionUpdate -> {
-			logger.info("sending " + positionUpdate);
+		TwoStageMoveNode nodeB = new TwoStageMoveNode("nodeB", 200, 100);
+		nodeB.setMoveTarget(200, 500);
+		ImageNode img = new ImageNode("file:src/main/resources/festum.png",300,200);
+	
+ 
+		DragEnabler.enableDrag(nodeA, positionUpdate -> {
+			session.sendPositionUpdate(positionUpdate);
+		});
+		DragEnabler.enableDrag(nodeB, positionUpdate -> {
+			session.sendPositionUpdate(positionUpdate);
+		});
+		DragEnabler.enableDrag(img, positionUpdate -> {
 			session.sendPositionUpdate(positionUpdate);
 		});
 
-		nodeB.setMoveTarget(200, 500);
 
 		Button move = new Button("Do Moves");
 		move.setOnAction(e -> {
@@ -64,7 +60,7 @@ public class IcarusUi extends Application {
 			nodeB.commitMove();
 		});
 
-		group = new Group(nodeA, nodeB, move, iv);
+		group = new Group(nodeA, nodeB, move, img);
 
 		session.onPositionUpdate(positionUpdate -> {
 			Node node = getFromGroup(positionUpdate.getId(), group);
