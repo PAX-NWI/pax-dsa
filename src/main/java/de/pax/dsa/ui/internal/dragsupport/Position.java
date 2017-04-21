@@ -1,6 +1,7 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.dragsupport;
 
 public class Position {
+	
 	private double x;
 	private double y;
 

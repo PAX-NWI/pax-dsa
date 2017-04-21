@@ -1,4 +1,4 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.animations;
 
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;

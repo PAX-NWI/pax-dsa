@@ -1,8 +1,6 @@
 package de.pax.dsa.ui;
 
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -10,10 +8,8 @@ import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.MockSessionImpl;
-import de.pax.dsa.ui.internal.DragEnabler;
-import de.pax.dsa.ui.internal.I2DObject;
-import de.pax.dsa.ui.internal.Position;
-import de.pax.dsa.ui.internal.TwoStageMoveNode;
+import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
+import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;

@@ -1,9 +1,8 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.dragsupport;
 
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.PositionUpdate;
-import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 import javafx.scene.image.ImageView;

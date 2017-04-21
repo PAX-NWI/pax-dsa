@@ -1,4 +1,4 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.nodes;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Color;

@@ -1,7 +1,7 @@
 package de.pax.dsa.ui.demoapplications;
 
-import de.pax.dsa.ui.internal.Anchor;
-import de.pax.dsa.ui.internal.MoveCenterTransition;
+import de.pax.dsa.ui.internal.animations.MoveCenterTransition;
+import de.pax.dsa.ui.internal.nodes.Anchor;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;

@@ -1,12 +1,12 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.nodes;
 
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.PositionUpdate;
-import javafx.scene.Cursor;
+import de.pax.dsa.ui.internal.animations.MoveCenterTransition;
+import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
 
