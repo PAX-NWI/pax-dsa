@@ -12,6 +12,7 @@ import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
+import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
 import javafx.application.Application;
@@ -19,9 +20,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 
 public class IcarusUi extends Application {
@@ -34,31 +33,7 @@ public class IcarusUi extends Application {
 		launch(args);
 	}
 
-	public Canvas createGrid(int offset) {
 
-		double w = 4000;// getBoundsInLocal().getWidth();
-		double h = 4000;// getBoundsInLocal().getHeight();
-
-		// add grid
-		Canvas grid = new Canvas(w, h);
-
-		// don't catch mouse events
-		grid.setMouseTransparent(true);
-
-		GraphicsContext gc = grid.getGraphicsContext2D();
-
-		gc.setStroke(Color.LIGHTGRAY);
-		gc.setLineWidth(1);
-
-		// draw grid lines
-		for (double i = offset; i < w; i += offset) {
-			gc.strokeLine(i, 0, i, h);
-			gc.strokeLine(0, i, w, i);
-		}
-
-		grid.toBack();
-		return grid;
-	}
 
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -97,7 +72,7 @@ public class IcarusUi extends Application {
 		// layout the scene.
 		// final StackPane background = new StackPane();
 		// background.setStyle("-fx-background-color: cornsilk;");
-		Canvas grid = createGrid(50);
+		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
 		Group root = new Group(group, grid);
 		final Scene scene = new Scene(root, 1000, 800);
