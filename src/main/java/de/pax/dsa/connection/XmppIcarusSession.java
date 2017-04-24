@@ -18,8 +18,6 @@ public class XmppIcarusSession implements IIcarusSession {
 
     private XmppManager xmppManager;
 
-
-
     @Override
     public void connect(String user, String password) {
         try {

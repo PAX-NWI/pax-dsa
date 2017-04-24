@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.MockSessionImpl;
+import de.pax.dsa.di.Context;
 import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
@@ -33,12 +34,11 @@ public class IcarusUi extends Application {
 		launch(args);
 	}
 
-
-
 	@Override
 	public void start(Stage stage) throws Exception {
 
-		IIcarusSession session = new MockSessionImpl();
+		Context context = new Context();
+		IIcarusSession session = context.createAndSet(MockSessionImpl.class);
 
 		session.connect("user", "password");
 
