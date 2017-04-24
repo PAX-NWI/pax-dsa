@@ -38,7 +38,8 @@ public class IcarusUi extends Application {
 	public void start(Stage stage) throws Exception {
 
 		Context context = new Context();
-		IIcarusSession session = context.createAndSet(MockSessionImpl.class);
+		IIcarusSession session = context.create(MockSessionImpl.class);
+		context.set(IIcarusSession.class, session);
 
 		session.connect("user", "password");
 
