@@ -36,13 +36,12 @@ public class Context {
 
 			for (Method method : clazz.getDeclaredMethods()) {
 				if (method.isAnnotationPresent(PostConstruct.class)) {
-					if (method.getParameters().length == 0) {
-						method.setAccessible(true);
-						method.invoke(creating);
-					} else {
+					if (method.getParameters().length != 0) {
 						throw new IllegalStateException(
 								clazz + "." + method + " invoke fail. can only init empty @PostConstruct Methods");
 					}
+					method.setAccessible(true);
+					method.invoke(creating);
 				}
 			}
 
