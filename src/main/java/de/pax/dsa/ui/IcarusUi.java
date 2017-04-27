@@ -26,8 +26,6 @@ import javafx.stage.Stage;
 
 public class IcarusUi extends Application {
 
-	private Group group;
-
 	private Logger logger = LoggerFactory.getLogger(IcarusUi.class);
 
 	public static void main(String[] args) {
@@ -61,7 +59,7 @@ public class IcarusUi extends Application {
 			nodeB.commitMove();
 		});
 
-		group = new Group(img, nodeA, nodeB, move);
+		Group group = new Group(img, nodeA, nodeB, move);
 
 		session.onPositionUpdate(positionUpdate -> {
 			I2DObject node = getFromGroup(positionUpdate.getId(), group);
@@ -76,6 +74,7 @@ public class IcarusUi extends Application {
 		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
 		Group root = new Group(group, grid);
+		
 		final Scene scene = new Scene(root, 1000, 800);
 
 		grid.widthProperty().bind(scene.widthProperty()); // does not really
