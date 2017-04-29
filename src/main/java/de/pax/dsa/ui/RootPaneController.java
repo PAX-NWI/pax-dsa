@@ -14,7 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.layout.Pane;
 
-public class IcarusMainController {
+public class RootPaneController {
 
 	@FXML
 	private Pane pane;

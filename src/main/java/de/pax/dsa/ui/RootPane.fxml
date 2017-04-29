@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pax.dsa.ui.IcarusMainController">
+<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pax.dsa.ui.RootPaneController">
    <top>
       <HBox BorderPane.alignment="CENTER">
          <children>
@@ -19,7 +19,7 @@
       </HBox>
    </top>
    <center>
-      <Pane fx:id="pane" prefHeight="600.0" prefWidth="800.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="pane" prefHeight="800.0" prefWidth="1000.0" BorderPane.alignment="CENTER" />
    </center>
    <left>
       <GridPane prefHeight="600.0" prefWidth="120.0" BorderPane.alignment="CENTER">

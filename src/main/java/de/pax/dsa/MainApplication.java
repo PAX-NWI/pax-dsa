@@ -6,7 +6,7 @@ import de.pax.dsa.di.Context;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class MainApplication extends Application {
@@ -22,11 +22,10 @@ public class MainApplication extends Application {
 		context.set(IIcarusSession.class, session);
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
-
-		BorderPane root = (BorderPane) fxmlLoader.load(getClass().getResource("ui/IcarusMain.fxml").openStream());
+		Pane rootPane = (Pane) fxmlLoader.load(getClass().getResource("ui/RootPane.fxml").openStream());
 		context.wire(fxmlLoader.getController());
 
-		Scene scene = new Scene(root);
+		Scene scene = new Scene(rootPane);
 		stage.setScene(scene);
 		stage.show();
 	}
