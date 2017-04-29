@@ -1,50 +1,41 @@
-package de.pax.dsa.ui;
+package de.pax.dsa.ui.internal;
 
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.inject.Inject;
+
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.connection.MockSessionImpl;
-import de.pax.dsa.di.Context;
 import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
-import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.stage.Stage;
 
-public class IcarusUi extends Application {
+public class MapContent {
 
-	private Logger logger = LoggerFactory.getLogger(IcarusUi.class);
+	@Inject
+	private IIcarusSession session;
 
-	public static void main(String[] args) {
-		launch(args);
-	}
+	@Inject
+	private Logger logger;
 
-	@Override
-	public void start(Stage stage) throws Exception {
+	private TwoStageMoveNode nodeA;
 
-		Context context = new Context();
-		IIcarusSession session = context.create(MockSessionImpl.class);
-		context.set(IIcarusSession.class, session);
+	private TwoStageMoveNode nodeB;
 
-		session.connect("user", "password");
+	public Group build() {
 
-		// Grid grid = new Grid(50);
-		TwoStageMoveNode nodeA = new TwoStageMoveNode("nodeA", 100, 100);
+		nodeA = new TwoStageMoveNode("nodeA", 100, 100);
 		nodeA.setMoveTarget(100, 300);
-		TwoStageMoveNode nodeB = new TwoStageMoveNode("nodeB", 200, 100);
+		nodeB = new TwoStageMoveNode("nodeB", 200, 100);
 		nodeB.setMoveTarget(200, 500);
 		ImageNode img = new ImageNode("file:src/main/resources/festum.png", 300, 200);
 
@@ -53,13 +44,7 @@ public class IcarusUi extends Application {
 		DragEnabler.enableDrag(nodeB, onDragComplete);
 		DragEnabler.enableDrag(img, onDragComplete);
 
-		Button move = new Button("Do Moves");
-		move.setOnAction(e -> {
-			nodeA.commitMove();
-			nodeB.commitMove();
-		});
-
-		Group group = new Group(img, nodeA, nodeB, move);
+		Group group = new Group(img, nodeA, nodeB);
 
 		session.onPositionUpdate(positionUpdate -> {
 			I2DObject node = getFromGroup(positionUpdate.getId(), group);
@@ -68,23 +53,15 @@ public class IcarusUi extends Application {
 			node.setY(positionUpdate.getY());
 		});
 
-		// layout the scene.
-		// final StackPane background = new StackPane();
-		// background.setStyle("-fx-background-color: cornsilk;");
 		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
 		Group root = new Group(group, grid);
-		
-		final Scene scene = new Scene(root, 1000, 800);
+		return root;
+	}
 
-		grid.widthProperty().bind(scene.widthProperty()); // does not really
-															// work :(
-		grid.heightProperty().bind(scene.heightProperty());
-
-		// background.prefHeightProperty().bind(scene.heightProperty());
-		// background.prefWidthProperty().bind(scene.widthProperty());
-		stage.setScene(scene);
-		stage.show();
+	public void doMoves() {
+		nodeA.commitMove();
+		nodeB.commitMove();
 	}
 
 	private I2DObject getFromGroup(String id, Group group) {

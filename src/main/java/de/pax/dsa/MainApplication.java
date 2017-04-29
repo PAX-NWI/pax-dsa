@@ -1,4 +1,4 @@
-package de.pax.dsa.ui;
+package de.pax.dsa;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.MockSessionImpl;
@@ -23,7 +23,7 @@ public class MainApplication extends Application {
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
 
-		BorderPane root = (BorderPane) fxmlLoader.load(getClass().getResource("IcarusMain.fxml").openStream());
+		BorderPane root = (BorderPane) fxmlLoader.load(getClass().getResource("ui/IcarusMain.fxml").openStream());
 		context.wire(fxmlLoader.getController());
 
 		Scene scene = new Scene(root);
