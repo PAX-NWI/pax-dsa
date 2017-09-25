@@ -4,6 +4,8 @@ package de.pax.dsa.xmpp;
 import org.jivesoftware.smack.*;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.jid.EntityBareJid;
@@ -38,6 +40,10 @@ public class XmppManager {
         logger.debug("Connected: {}", connection.isConnected());
 
         chatManager = ChatManager.getInstanceFor(connection);
+	}
+	
+	public ChatManager getChatManager() {
+		return chatManager;
 	}
 
 	public void sendMessage(String message, String buddyJID) throws XMPPException, XmppStringprepException, SmackException.NotConnectedException, InterruptedException {

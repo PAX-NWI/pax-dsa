@@ -44,7 +44,6 @@ public class RootPaneController {
 
 		System.out.println("happy");
 		logger.info("logger happy");
-		session.connect("dsa", "dsa");
 
 	}
 

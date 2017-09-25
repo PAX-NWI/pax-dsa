@@ -3,7 +3,9 @@ package de.pax.dsa.connection;
 import de.pax.dsa.model.PositionUpdate;
 import de.pax.dsa.xmpp.XmppManager;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,11 @@ public class XmppIcarusSession implements IIcarusSession {
 
     @Override
     public void sendPositionUpdate(PositionUpdate positionUpdate) {
-
+    	try {
+			xmppManager.sendMessage(positionUpdate.toString(), "pax2@jabber.de");
+		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     }
 }
