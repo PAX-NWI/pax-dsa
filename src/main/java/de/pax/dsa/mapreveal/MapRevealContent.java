@@ -53,14 +53,14 @@ public class MapRevealContent {
 		DragEnabler.enableDrag(figure, e -> {
 			long startTime = System.currentTimeMillis();
 			nodes.parallelStream().forEach(node -> {
-				if (node instanceof Rectangle) {
-					Rectangle rectangle = (Rectangle) node;
+				if (node instanceof RevealRectangle) {
+					RevealRectangle rectangle = (RevealRectangle) node;
 
 					boolean intersects = intersects(rectangle, figure.getSightMarker());
 					if (intersects) {
-						rectangle.setOpacity(0);
+						rectangle.reveal();
 					} else {
-						rectangle.setOpacity(1);
+						rectangle.unReveal();
 					}
 				}
 			});
@@ -94,11 +94,11 @@ public class MapRevealContent {
 	}
 
 	private boolean intersects(Shape first, Shape second) {
-		//fast check if it is close and needs to be checked
+		// fast check if it is close and needs to be checked
 		if (!first.getBoundsInParent().intersects(second.getBoundsInParent())) {
 			return false;
 		}
-		//expensive check if it really overlaps
+		// expensive check if it really overlaps
 		return (Shape.intersect(first, second).getBoundsInLocal().getWidth() > 1);
 	}
 

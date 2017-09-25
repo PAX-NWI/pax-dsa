@@ -12,7 +12,7 @@ public class Figure extends Group implements I2DObject{
 	private Circle sightMarker;
 
 	public Figure(double sightRadius) {
-		position = new Circle(5);
+		position = new Circle(2);
 		position.setFill(Color.BLACK);
 		getChildren().add(position);
 		

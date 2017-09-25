@@ -1,30 +1,48 @@
 package de.pax.dsa.mapreveal.moveables;
 
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
-import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class RevealRectangle extends Rectangle implements I2DObject {
 
+	public enum State {
+		KNOWN, UNKNOW, CURRENT
+	}
+
+	private State state = State.UNKNOW;
+
 	public RevealRectangle(int i, int j) {
 		super(i, j);
-
 		setStroke(Color.DARKGRAY);
 		setFill(Color.GREY);
+		update();
+	}
 
-		setOpacity(1);
-		setOnMouseClicked(event -> {
-			if (event.getButton() == MouseButton.SECONDARY) {
-				if (getOpacity() > 0) {
-					setOpacity(0);
-				} else {
-					setOpacity(1);
-				}
-				
-			}
-		});
+	public void reveal() {
+		state = State.CURRENT;
+		update();
+	}
 
+	public void unReveal() {
+		if (state == State.CURRENT) {
+			state = State.KNOWN;
+			update();
+		}
+	}
+
+	private void update() {
+		switch (state) {
+		case UNKNOW:
+			setOpacity(1);
+			break;
+		case CURRENT:
+			setOpacity(0);
+			break;
+		case KNOWN:
+			setOpacity(0.5);
+			break;
+		}
 	}
 
 }
