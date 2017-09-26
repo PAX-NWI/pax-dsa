@@ -21,7 +21,7 @@ public class MapRevealContent {
 	@Inject
 	private Logger logger;
 
-	final double SCALE_DELTA = 1.1;
+	final static double SCALE_DELTA = 1.1;
 
 	public Group build() {
 

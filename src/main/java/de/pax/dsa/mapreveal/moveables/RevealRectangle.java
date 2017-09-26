@@ -20,8 +20,10 @@ public class RevealRectangle extends Rectangle implements I2DObject {
 	}
 
 	public void reveal() {
-		state = State.CURRENT;
-		update();
+		if (state != State.CURRENT) {
+			state = State.CURRENT;
+			update();
+		}
 	}
 
 	public void unReveal() {
