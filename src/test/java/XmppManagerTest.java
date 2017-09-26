@@ -20,6 +20,8 @@ import de.pax.dsa.xmpp.XmppManager;
  * Created by swinter on 11.04.2017.
  */
 public class XmppManagerTest {
+	private static final String AT = "@";
+
 	static final String SERVER = "jabber.de";
 
 	private XmppManager user1_manager;
@@ -28,7 +30,7 @@ public class XmppManagerTest {
 	private String user1_username;
 	private String user2_username;
 
-	String receivedMessage;
+	private String receivedMessage;
 
 	@Before
 	public void setUp() throws InterruptedException, IOException, SmackException, XMPPException {
@@ -64,9 +66,9 @@ public class XmppManagerTest {
 			}
 		});
 
-		user1_manager.sendMessage("test", user2_username);
+		user1_manager.sendMessage("test", user2_username + AT + SERVER);
 
-		Thread.sleep(3000);
+		Thread.sleep(2000);
 
 		assertEquals("test", receivedMessage);
 	}
