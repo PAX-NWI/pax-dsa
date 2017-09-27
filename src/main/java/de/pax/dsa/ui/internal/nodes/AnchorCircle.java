@@ -5,10 +5,16 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
 
-public class Anchor extends Circle {
-	
-	
-	public Anchor(String id, DoubleProperty x, DoubleProperty y) {
+/**
+ * Extension of the Circle class to enable updating the center position with
+ * bounded properties (from other objects).
+ * 
+ * @author alexander.bunkowski
+ *
+ */
+public class AnchorCircle extends Circle {
+
+	public AnchorCircle(String id, DoubleProperty x, DoubleProperty y) {
 		super(x.get(), y.get(), 20);
 		setId(id);
 		setFill(Color.CORNFLOWERBLUE.deriveColor(1, 1, 1, 0.5));

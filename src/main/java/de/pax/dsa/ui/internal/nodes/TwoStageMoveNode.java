@@ -9,30 +9,28 @@ import javafx.scene.shape.StrokeLineCap;
 
 public class TwoStageMoveNode extends Group implements I2DObject {
 
-	private Anchor position;
-	private Anchor moveTarget;
+	private AnchorCircle position;
+	private AnchorCircle moveTarget;
 
 
 	public TwoStageMoveNode(String string, double x, double y) {
+	
+		setId(string);
+		
 		Line line = new Line(x, y, x, y);
 		line.setStrokeLineCap(StrokeLineCap.ROUND);
 		line.setStroke(Color.CORNFLOWERBLUE);
 		line.setStrokeWidth(5);
 		line.setMouseTransparent(true);
 
-		position = new Anchor("position", line.startXProperty(), line.startYProperty());
-		moveTarget = new Anchor("marker", line.endXProperty(), line.endYProperty());
-		moveTarget.setFill(Color.TRANSPARENT);
-
-		moveTarget.getStrokeDashArray().addAll(2d, 20d);
-
+		position = new AnchorCircle("position", line.startXProperty(), line.startYProperty());
 		position.setMouseTransparent(true);
-
+	
+		moveTarget = new AnchorCircle("moveTarget", line.endXProperty(), line.endYProperty());
+		moveTarget.setFill(Color.TRANSPARENT);
+		moveTarget.getStrokeDashArray().addAll(2d, 20d);
 		
-
 		getChildren().addAll(line, position, moveTarget);
-
-		setId(string);
 	}
 
 	public void setMoveTarget(double x, double y) {

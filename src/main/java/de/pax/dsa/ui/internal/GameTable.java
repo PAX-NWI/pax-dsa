@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -14,12 +15,14 @@ import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
+import de.pax.dsa.ui.internal.nodes.MoveableCircle;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.layout.Pane;
 
-public class MapContent {
+public class GameTable {
 
 	@Inject
 	private IIcarusSession session;
@@ -30,6 +33,25 @@ public class MapContent {
 	private TwoStageMoveNode nodeA;
 
 	private TwoStageMoveNode nodeB;
+
+	private Pane pane;
+
+	@PostConstruct
+	private void posConstruct(Pane pane) {
+
+		this.pane = pane;
+		Canvas grid = GridFactory.createGrid(50);
+		grid.setStyle("-fx-background-color: cornsilk;");
+		pane.getChildren().add(grid);
+
+		pane.getChildren().add(build());
+	}
+
+	public void addCircle(String id) {
+		MoveableCircle circle = new MoveableCircle(id, 50, 50, 20);
+		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
+		pane.getChildren().add(circle);
+	}
 
 	public Group build() {
 
@@ -45,7 +67,6 @@ public class MapContent {
 		DragEnabler.enableDrag(img, onDragComplete);
 
 		Group group = new Group(img, nodeA, nodeB);
-
 		session.onPositionUpdate(positionUpdate -> {
 			I2DObject node = getFromGroup(positionUpdate.getId(), group);
 			logger.info("received " + positionUpdate);
@@ -53,10 +74,7 @@ public class MapContent {
 			node.setY(positionUpdate.getY());
 		});
 
-		Canvas grid = GridFactory.createGrid(50);
-		grid.setStyle("-fx-background-color: cornsilk;");
-		Group root = new Group(group, grid);
-		return root;
+		return group;
 	}
 
 	public void doMoves() {

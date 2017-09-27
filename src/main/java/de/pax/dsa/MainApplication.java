@@ -1,7 +1,7 @@
 package de.pax.dsa;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.connection.XmppIcarusSession;
+import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.di.Context;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -18,9 +18,11 @@ public class MainApplication extends Application {
 	public void start(Stage stage) throws Exception {
 
 		Context context = new Context();
-		IIcarusSession session = context.create(XmppIcarusSession.class);
-		session.connect(System.getProperty("user1_username"), System.getProperty("user1_password"));
 		
+		context.set(Stage.class, stage);
+		
+		IIcarusSession session = context.create(MockSessionImpl.class);
+		session.connect(System.getProperty("user2_username"), System.getProperty("user2_password"));
 		
 		context.set(IIcarusSession.class, session);
 
