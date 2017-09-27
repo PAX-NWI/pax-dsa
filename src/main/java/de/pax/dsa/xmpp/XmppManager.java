@@ -45,14 +45,10 @@ public class XmppManager {
 		SmackConfiguration.DEBUG = true;
 
 		Builder config = XMPPTCPConnectionConfiguration.builder();
-		config.setSecurityMode(ConnectionConfiguration.SecurityMode.ifpossible);
-		config.setSocketFactory(SSLSocketFactory.getDefault());
 		config.setXmppDomain(server);
 		config.setResource("IcarusClient");
 		config.setUsernameAndPassword(username, password);
-	//	config.setPort(443);
 		config.setDebuggerEnabled(true);
-		// config.setConnectTimeout(2000);
 
 		connection = new XMPPTCPConnection(config.build());
 
@@ -72,9 +68,6 @@ public class XmppManager {
 	public void sendMessage(String message, String buddyJID)
 			throws XMPPException, XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
 		logger.debug("Sending mesage '{}' to user {}", message, buddyJID);
-		if (!buddyJID.contains("@")) {
-			throw new IllegalStateException("target buddy id must contain @");
-		}
 
 		EntityBareJid jid = JidCreate.entityBareFrom(buddyJID + "@" + server);
 		Chat chat = chatManager.chatWith(jid);

@@ -1,5 +1,7 @@
 package de.pax.dsa.model;
 
+import java.util.Map;
+
 public class PositionUpdate {
 
 	private String id;
@@ -10,6 +12,13 @@ public class PositionUpdate {
 		this.id = id;
 		this.x = x;
 		this.y = y;
+	}
+
+	public PositionUpdate(String string) {
+		Map<String, String> map = StringMapper.keyValueListStringToMap(string);
+		setId(map.get("id"));
+		setX(Double.parseDouble(map.get("x")));
+		setY(Double.parseDouble(map.get("y")));
 	}
 
 	public String getId() {

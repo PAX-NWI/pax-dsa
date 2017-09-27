@@ -66,9 +66,9 @@ public class XmppManagerTest {
 			}
 		});
 
-		user1_manager.sendMessage("test", user2_username + AT + SERVER);
+		user1_manager.sendMessage("test", user2_username);
 
-		Thread.sleep(2000);
+		Thread.sleep(5000);
 
 		assertEquals("test", receivedMessage);
 	}

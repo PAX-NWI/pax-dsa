@@ -60,18 +60,23 @@ public class GameTable {
 		nodeB = new TwoStageMoveNode("nodeB", 200, 100);
 		nodeB.setMoveTarget(200, 500);
 		ImageNode img = new ImageNode("file:src/main/resources/festum.png", 300, 200);
+		
+		MoveableCircle circle = new MoveableCircle("circle", 50, 50, 20);
+		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
+		
 
 		Consumer<PositionUpdate> onDragComplete = session::sendPositionUpdate;
 		DragEnabler.enableDrag(nodeA, onDragComplete);
 		DragEnabler.enableDrag(nodeB, onDragComplete);
 		DragEnabler.enableDrag(img, onDragComplete);
 
-		Group group = new Group(img, nodeA, nodeB);
+		Group group = new Group(img, nodeA, nodeB, circle);
 		session.onPositionUpdate(positionUpdate -> {
 			I2DObject node = getFromGroup(positionUpdate.getId(), group);
 			logger.info("received " + positionUpdate);
 			node.setX(positionUpdate.getX());
 			node.setY(positionUpdate.getY());
+		
 		});
 
 		return group;
