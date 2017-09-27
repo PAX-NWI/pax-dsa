@@ -14,7 +14,15 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Dependency Injection Container to enable usage of @Inject and @PostConstruct
+ * 
+ * @author alexander.bunkowski
+ *
+ */
 public class Context {
+
+	Logger logger = LoggerFactory.getLogger(Context.class);
 
 	private HashMap<Class<?>, Object> hashMap;
 
@@ -24,9 +32,15 @@ public class Context {
 	}
 
 	public void set(Class<?> clazz, Object object) {
+		if (hashMap.containsKey(clazz)) {
+			logger.warn("Class {} already exists, it's overwritten now.");
+		}
 		hashMap.put(clazz, object);
 	}
 
+	/**
+	 * Creates a new Object of Type T and injects requested objects into it
+	 */
 	public <T> T create(Class<T> clazz) {
 		try {
 			T creating = clazz.newInstance();
@@ -35,6 +49,16 @@ public class Context {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Creates a new Object of Type T, injects requested objects into it and
+	 * puts it into context
+	 */
+	public <T> T createAndSet(Class<T> clazz) {
+		T create = create(clazz);
+		hashMap.put(clazz, create);
+		return create;
 	}
 
 	public void wire(Object objectToWire) throws IllegalAccessException, InvocationTargetException {
@@ -70,19 +94,13 @@ public class Context {
 					requiredParameters.add(value);
 				}
 				method.setAccessible(true);
-				if (requiredParameters.size() == 0) {
+				if (requiredParameters.isEmpty()) {
 					method.invoke(objectToWire);
 				} else {
 					method.invoke(objectToWire, requiredParameters.toArray());
 				}
 			}
 		}
-	}
-
-	public <T> T createAndSet(Class<T> clazz) {
-		T create = create(clazz);
-		hashMap.put(clazz, create);
-		return create;
 	}
 
 }

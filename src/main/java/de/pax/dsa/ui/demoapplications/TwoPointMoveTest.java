@@ -1,7 +1,7 @@
 package de.pax.dsa.ui.demoapplications;
 
 import de.pax.dsa.ui.internal.animations.MoveCenterTransition;
-import de.pax.dsa.ui.internal.nodes.Anchor;
+import de.pax.dsa.ui.internal.nodes.AnchorCircle;
 import javafx.application.Application;
 import javafx.scene.Cursor;
 import javafx.scene.Group;
@@ -29,8 +29,8 @@ public class TwoPointMoveTest extends Application {
 		line.setStroke(Color.MIDNIGHTBLUE);
 		line.setStrokeWidth(5);
 
-		final Anchor position = new Anchor("Position", line.startXProperty(), line.startYProperty());
-		final Anchor moveTarget = new Anchor("Move Target", line.endXProperty(), line.endYProperty());
+		final AnchorCircle position = new AnchorCircle("Position", line.startXProperty(), line.startYProperty());
+		final AnchorCircle moveTarget = new AnchorCircle("Move Target", line.endXProperty(), line.endYProperty());
 
 		enableDrag(moveTarget);
 		Button button = new Button("Do Move");
@@ -55,7 +55,7 @@ public class TwoPointMoveTest extends Application {
 
 	}
 
-	private void moveTo(Anchor anchor1, Anchor anchor2) {
+	private void moveTo(AnchorCircle anchor1, AnchorCircle anchor2) {
 		MoveCenterTransition move = new MoveCenterTransition(anchor1, anchor2.getCenterX(), anchor2.getCenterY());
 		move.play();
 	}

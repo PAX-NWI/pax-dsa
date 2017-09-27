@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -10,34 +14,23 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pax.dsa.ui.RootPaneController">
+<BorderPane xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="de.pax.dsa.ui.RootPaneController">
    <top>
-      <HBox BorderPane.alignment="CENTER">
+      <HBox spacing="5.0" BorderPane.alignment="CENTER">
          <children>
+            <Button mnemonicParsing="false" onAction="#handleLogin" text="Login" />
+            <Button mnemonicParsing="false" onAction="#handleAddElement" text="Add Element" />
             <Button fx:id="doMovesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Do Moves" />
          </children>
+         <BorderPane.margin>
+            <Insets />
+         </BorderPane.margin>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
       </HBox>
    </top>
    <center>
-      <Pane fx:id="pane" prefHeight="800.0" prefWidth="1000.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="mapPane" prefHeight="800.0" prefWidth="1000.0" BorderPane.alignment="CENTER" />
    </center>
-   <left>
-      <GridPane prefHeight="600.0" prefWidth="120.0" BorderPane.alignment="CENTER">
-        <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-        </columnConstraints>
-        <rowConstraints>
-          <RowConstraints />
-          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-          <RowConstraints />
-            <RowConstraints />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-        </rowConstraints>
-         <children>
-            <ListView fx:id="mapObjectList" prefHeight="200.0" prefWidth="200.0" GridPane.rowIndex="1" />
-            <Label text="My Map Objects:" />
-            <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Log into session" GridPane.rowIndex="4" GridPane.valignment="BOTTOM" />
-         </children>
-      </GridPane>
-   </left>
 </BorderPane>
