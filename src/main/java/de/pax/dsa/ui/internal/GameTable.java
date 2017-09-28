@@ -22,6 +22,7 @@ import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.MoveableCircle;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -89,7 +90,9 @@ public class GameTable {
 			if (elementType == ElementType.CIRCLE) {
 
 				MoveableCircle newCircle = ElementMessageConverter.circleFromMessage(elementAddedMessage);
-				elementGroup.getChildren().add(newCircle);
+				
+				 Platform.runLater(() -> elementGroup.getChildren().add(newCircle));
+				
 
 			} else {
 				logger.warn("Unknown element type {}", elementType);

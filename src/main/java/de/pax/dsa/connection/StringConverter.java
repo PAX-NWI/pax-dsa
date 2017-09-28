@@ -1,5 +1,6 @@
 package de.pax.dsa.connection;
 
+import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 
 public class StringConverter {
@@ -8,6 +9,8 @@ public class StringConverter {
 
 		if (string.startsWith("PositionUpdate")) {
 			return new PositionUpdatedMessage(string);
+		} else if(string.startsWith("ElementAddedMessage")){
+			return new ElementAddedMessage(string);
 		}
 
 		return null;

@@ -25,6 +25,8 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<PositionUpdatedMessage> positionUpdateConsumer;
 
+	private Consumer<ElementAddedMessage> onElementAddedConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		try {
@@ -36,6 +38,8 @@ public class XmppIcarusSession implements IIcarusSession {
 			Object decode = StringConverter.decode(message.getBody());
 			if (decode instanceof PositionUpdatedMessage) {
 				positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
+			} else if (decode instanceof ElementAddedMessage) {
+				onElementAddedConsumer.accept((ElementAddedMessage) decode);
 			} else {
 				logger.warn("Received non decodable message: " + message);
 			}
@@ -54,17 +58,17 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void sendElementAdded(ElementAddedMessage elementAddedMessage) {
-		
+		xmppManager.sendMessage(elementAddedMessage.toString());
 	}
 
 	@Override
-	public void onElementAdded(Consumer<ElementAddedMessage> positionUpdateConsumer) {
-		
+	public void onElementAdded(Consumer<ElementAddedMessage> onElementAddedConsumer) {
+		this.onElementAddedConsumer = onElementAddedConsumer;
 	}
 
 	@Override
 	public void disconnect() {
 		xmppManager.disconnect();
 	}
-	
+
 }

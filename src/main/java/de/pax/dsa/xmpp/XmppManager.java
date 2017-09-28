@@ -13,6 +13,7 @@ import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration.Builder;
+import org.jivesoftware.smackx.muc.MucEnterConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jxmpp.jid.EntityBareJid;
@@ -39,7 +40,7 @@ import org.slf4j.LoggerFactory;
 public class XmppManager {
 	private static final String ROOM_PROVIDER = "@conference.jabber.de";
 
-	private static final String ROOM_NAME = "icarus42";
+	private static final String ROOM_NAME = "icarus43";
 
 	private static Logger logger = LoggerFactory.getLogger(XmppManager.class);
 
@@ -56,13 +57,13 @@ public class XmppManager {
 		logger.debug("Initializing connection to server {}", server);
 		SmackConfiguration.DEBUG = true;
 
-		Builder config = XMPPTCPConnectionConfiguration.builder();
-		config.setXmppDomain(server);
-		config.setResource("IcarusClient");
-		config.setUsernameAndPassword(username, password);
-		config.setDebuggerEnabled(true);
+		XMPPTCPConnectionConfiguration.Builder connectionConfig = XMPPTCPConnectionConfiguration.builder();
+		connectionConfig.setXmppDomain(server);
+		connectionConfig.setResource("IcarusClient");
+		connectionConfig.setUsernameAndPassword(username, password);
+		connectionConfig.setDebuggerEnabled(true);
 
-		connection = new XMPPTCPConnection(config.build());
+		connection = new XMPPTCPConnection(connectionConfig.build());
 
 		connection.connect();
 		logger.debug("Connected: {}", connection.isConnected());
@@ -73,7 +74,11 @@ public class XmppManager {
 		EntityBareJid room = JidCreate.entityBareFrom(ROOM_NAME + ROOM_PROVIDER);
 		MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
 		multiUserChat = manager.getMultiUserChat(room);
-		multiUserChat.join(Resourcepart.from(username));
+	
+		MucEnterConfiguration.Builder enterConfig = multiUserChat.getEnterConfigurationBuilder(Resourcepart.from(username));
+		enterConfig.requestNoHistory();
+		
+		multiUserChat.join(enterConfig.build());
 
 		chatManager = ChatManager.getInstanceFor(connection);
 	}
