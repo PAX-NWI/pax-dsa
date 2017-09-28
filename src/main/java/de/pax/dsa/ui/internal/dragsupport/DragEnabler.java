@@ -2,13 +2,13 @@ package de.pax.dsa.ui.internal.dragsupport;
 
 import java.util.function.Consumer;
 
-import de.pax.dsa.model.PositionUpdate;
+import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import javafx.scene.Cursor;
 import javafx.scene.Node;
 
 public class DragEnabler {
 
-	public static void enableDrag(Node node, I2DObject i2dObject, Consumer<PositionUpdate> onDragComplete) {
+	public static void enableDrag(Node node, I2DObject i2dObject, Consumer<PositionUpdatedMessage> onDragComplete) {
 
 		final Position dragDelta = new Position();
 		node.setOnMousePressed(mouseEvent -> {
@@ -20,7 +20,7 @@ public class DragEnabler {
 		node.setOnMouseReleased(mouseEvent -> {
 			node.getScene().setCursor(Cursor.HAND);
 			if (onDragComplete != null) {
-				onDragComplete.accept(new PositionUpdate(node.getId(), i2dObject.getX(), i2dObject.getY()));
+				onDragComplete.accept(new PositionUpdatedMessage(node.getId(), i2dObject.getX(), i2dObject.getY()));
 			}
 		});
 		node.setOnMouseDragged(mouseEvent -> {
@@ -39,37 +39,8 @@ public class DragEnabler {
 		});
 	}
 	
-	public static void enableDrag(Node node, Consumer<PositionUpdate> onDragComplete) {
+	public static void enableDrag(Node node, Consumer<PositionUpdatedMessage> onDragComplete) {
 		enableDrag(node, (I2DObject) node, onDragComplete);
 	}
-
-	// public static void enableDrag(ImageView imageView,
-	// Consumer<PositionUpdate> onDragComplete) {
-	// I2DObject i2dObject = new I2DObject() {
-	//
-	// @Override
-	// public double getX() {
-	// return imageView.getX();
-	// }
-	//
-	// @Override
-	// public double getY() {
-	// return imageView.getY();
-	// }
-	//
-	// @Override
-	// public void setY(double y) {
-	// imageView.setY(y);
-	// }
-	//
-	// @Override
-	// public void setX(double x) {
-	// imageView.setX(x);
-	// }
-	//
-	// };
-	// enableDrag(imageView, i2dObject, onDragComplete);
-	//
-	// }
 
 }

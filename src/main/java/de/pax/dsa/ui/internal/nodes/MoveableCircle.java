@@ -5,7 +5,7 @@ import javafx.scene.shape.Circle;
 
 public class MoveableCircle extends Circle implements I2DObject {
 
-	public MoveableCircle(String id, int centerX, int centerY, int radius) {
+	public MoveableCircle(String id, double centerX, double centerY, double radius) {
 		super(centerX, centerY, radius);
 		setId(id);
 	}

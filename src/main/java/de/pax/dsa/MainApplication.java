@@ -22,8 +22,8 @@ public class MainApplication extends Application {
 		
 		context.set(Stage.class, stage);
 		
-		IIcarusSession session = context.create(XmppIcarusSession.class);
-		session.connect(System.getProperty("user2_username"), System.getProperty("user2_password"));
+		IIcarusSession session = context.create(MockSessionImpl.class);
+		//session.connect(System.getProperty("user2_username"), System.getProperty("user2_password"));
 		
 		context.set(IIcarusSession.class, session);
 

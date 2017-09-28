@@ -9,24 +9,22 @@ public class StringMapper {
 
 	/**
 	 * Takes a string like "Trallala [id=id, x=52.0, y=42.0]" an converts it
-	 * into an usable Map of the contained key=value pairs
+	 * into an Map of the contained key=value pairs
 	 */
 	public static Map<String, String> keyValueListStringToMap(String string) {
 
 		HashMap<String, String> map = new HashMap<>();
 
-		Pattern p = Pattern.compile("\\[(.*?)\\]");
-		Matcher m = p.matcher(string);
+		Pattern pattern = Pattern.compile("\\[(.*?)\\]");
+		Matcher matcher = pattern.matcher(string);
 
-		m.find();
+		matcher.find();
 
-		String elements = m.group(0).replaceAll("\\[|\\]", "");
-		String[] split = elements.split(",");
-		for (String keyValuePair : split) {
-			String[] pair = keyValuePair.split("=");
-			map.put(pair[0].trim(), pair[1].trim());
+		String[] keyValueStrings = matcher.group(0).replaceAll("\\[|\\]| ", "").split(",");
+		for (String keyValueString : keyValueStrings) {
+			String[] keyValue = keyValueString.split("=");
+			map.put(keyValue[0], keyValue[1]);
 		}
-
 		return map;
 	}
 

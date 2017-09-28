@@ -1,5 +1,6 @@
 package de.pax.dsa.ui.internal;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -10,7 +11,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.model.PositionUpdate;
+import de.pax.dsa.model.ElementType;
+import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementMessageConverter;
+import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.nodes.GridFactory;
@@ -28,18 +33,20 @@ public class GameTable {
 	private IIcarusSession session;
 
 	@Inject
+	private Pane pane;
+
+	@Inject
 	private Logger logger;
 
 	private TwoStageMoveNode nodeA;
 
 	private TwoStageMoveNode nodeB;
 
-	private Pane pane;
+	private Group elementGroup;
 
 	@PostConstruct
-	private void posConstruct(Pane pane) {
+	private void posConstruct() {
 
-		this.pane = pane;
 		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
 		pane.getChildren().add(grid);
@@ -48,38 +55,49 @@ public class GameTable {
 	}
 
 	public void addCircle(String id) {
-		MoveableCircle circle = new MoveableCircle(id, 50, 50, 20);
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		MoveableCircle circle = new MoveableCircle("Circle created at " + timestamp.getTime(), 50, 50, 20);
 		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
-		pane.getChildren().add(circle);
+		elementGroup.getChildren().add(circle);
+		session.sendElementAdded(ElementMessageConverter.createCircleAddedMessage(circle));
 	}
 
 	public Group build() {
+		Consumer<PositionUpdatedMessage> onDragComplete = session::sendPositionUpdate;
 
 		nodeA = new TwoStageMoveNode("nodeA", 100, 100);
 		nodeA.setMoveTarget(100, 300);
 		nodeB = new TwoStageMoveNode("nodeB", 200, 100);
 		nodeB.setMoveTarget(200, 500);
 		ImageNode img = new ImageNode("file:src/main/resources/festum.png", 300, 200);
-		
-		MoveableCircle circle = new MoveableCircle("circle", 50, 50, 20);
-		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
-		
 
-		Consumer<PositionUpdate> onDragComplete = session::sendPositionUpdate;
 		DragEnabler.enableDrag(nodeA, onDragComplete);
 		DragEnabler.enableDrag(nodeB, onDragComplete);
 		DragEnabler.enableDrag(img, onDragComplete);
 
-		Group group = new Group(img, nodeA, nodeB, circle);
+		elementGroup = new Group(img, nodeA, nodeB);
+
 		session.onPositionUpdate(positionUpdate -> {
-			I2DObject node = getFromGroup(positionUpdate.getId(), group);
+			I2DObject node = getFromGroup(positionUpdate.getId(), elementGroup);
 			logger.info("received " + positionUpdate);
-			node.setX(positionUpdate.getX());
-			node.setY(positionUpdate.getY());
-		
+
+			new Move2DTransition(node, positionUpdate.getX(), positionUpdate.getY()).play();
 		});
 
-		return group;
+		session.onElementAdded(elementAddedMessage -> {
+			ElementType elementType = elementAddedMessage.getElementType();
+			if (elementType == ElementType.CIRCLE) {
+
+				MoveableCircle newCircle = ElementMessageConverter.circleFromMessage(elementAddedMessage);
+				elementGroup.getChildren().add(newCircle);
+
+			} else {
+				logger.warn("Unknown element type {}", elementType);
+			}
+
+		});
+
+		return elementGroup;
 	}
 
 	public void doMoves() {

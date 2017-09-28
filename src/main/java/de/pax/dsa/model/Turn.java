@@ -3,20 +3,27 @@ package de.pax.dsa.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.pax.dsa.model.messages.PositionUpdatedMessage;
+
+/**
+ * not used at the moment
+ * @author alexander.bunkowski
+ *
+ */
 public class Turn {
 
-	private List<PositionUpdate> positionUpdates;
+	private List<PositionUpdatedMessage> positionUpdatedMessages;
 
 	public Turn() {
-		positionUpdates = new ArrayList<>();
+		positionUpdatedMessages = new ArrayList<>();
 	}
 
-	public List<PositionUpdate> getPositionUpdates() {
-		return positionUpdates;
+	public List<PositionUpdatedMessage> getPositionUpdates() {
+		return positionUpdatedMessages;
 	}
 
-	public void setPositionUpdates(List<PositionUpdate> positionUpdates) {
-		this.positionUpdates = positionUpdates;
+	public void setPositionUpdates(List<PositionUpdatedMessage> positionUpdatedMessages) {
+		this.positionUpdatedMessages = positionUpdatedMessages;
 	}
 
 }

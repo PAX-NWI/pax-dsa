@@ -7,7 +7,7 @@ apply plugin: 'application'
 sourceCompatibility = 1.8
 
 
-mainClassName = 'de.pax.dsa.HelloWorld'
+mainClassName = 'de.pax.dsa.MainApplication'
 
 repositories {
     mavenCentral()

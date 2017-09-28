@@ -3,6 +3,11 @@ package de.pax.dsa.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * not used at the moment
+ * @author alexander.bunkowski
+ *
+ */
 public class IcarusModel {
 
 	private List<Turn> turns;

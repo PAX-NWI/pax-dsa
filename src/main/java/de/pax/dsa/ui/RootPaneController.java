@@ -13,7 +13,6 @@ import de.pax.dsa.ui.internal.GameTable;
 import de.pax.dsa.ui.logindialog.LoginDialogController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.AnchorPane;

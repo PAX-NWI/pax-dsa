@@ -1,5 +1,10 @@
 package de.pax.dsa.model;
 
+/**
+ * not used at the moment
+ * @author alexander.bunkowski
+ *
+ */
 public class Character {
 
 	private String name;
