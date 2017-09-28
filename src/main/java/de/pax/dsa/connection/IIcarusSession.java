@@ -8,6 +8,8 @@ import de.pax.dsa.model.messages.PositionUpdatedMessage;
 public interface IIcarusSession {
 
 	void connect(String user, String password);
+	
+	void disconnect();
 
 	void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer);
 

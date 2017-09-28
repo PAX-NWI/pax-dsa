@@ -56,7 +56,7 @@ public class GameTable {
 
 	public void addCircle(String id) {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		MoveableCircle circle = new MoveableCircle("Circle created at " + timestamp.getTime(), 50, 50, 20);
+		MoveableCircle circle = new MoveableCircle("" + timestamp.getTime(), 50, 50, 20);
 		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
 		elementGroup.getChildren().add(circle);
 		session.sendElementAdded(ElementMessageConverter.createCircleAddedMessage(circle));

@@ -77,6 +77,10 @@ public class XmppManager {
 
 		chatManager = ChatManager.getInstanceFor(connection);
 	}
+	
+	public void disconnect() {
+		connection.disconnect();
+	}
 
 	public void addMessageListener(MessageListener messageListener) {
 		multiUserChat.addMessageListener(messageListener);

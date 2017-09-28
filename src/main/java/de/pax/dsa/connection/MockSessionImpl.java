@@ -41,4 +41,10 @@ public class MockSessionImpl implements IIcarusSession{
 		
 	}
 
+	@Override
+	public void disconnect() {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

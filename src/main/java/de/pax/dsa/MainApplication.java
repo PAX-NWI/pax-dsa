@@ -1,7 +1,6 @@
 package de.pax.dsa;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
@@ -11,6 +10,8 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class MainApplication extends Application {
+
+	private IIcarusSession session;
 
 	public static void main(String[] args) {
 		launch(args);
@@ -22,8 +23,7 @@ public class MainApplication extends Application {
 		
 		context.set(Stage.class, stage);
 		
-		IIcarusSession session = context.create(MockSessionImpl.class);
-		//session.connect(System.getProperty("user2_username"), System.getProperty("user2_password"));
+		session = context.create(XmppIcarusSession.class);
 		
 		context.set(IIcarusSession.class, session);
 
@@ -34,5 +34,11 @@ public class MainApplication extends Application {
 		Scene scene = new Scene(rootPane);
 		stage.setScene(scene);
 		stage.show();
+	}
+	
+	@Override
+	public void stop() throws Exception {
+		session.disconnect();
+		super.stop();
 	}
 }

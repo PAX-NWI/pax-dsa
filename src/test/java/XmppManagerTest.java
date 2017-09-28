@@ -5,13 +5,10 @@ import java.io.IOException;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.chat2.Chat;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.util.StringUtils;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.stringprep.XmppStringprepException;
 
 import de.pax.dsa.xmpp.XmppManager;
@@ -57,20 +54,22 @@ public class XmppManagerTest {
 	public void sendMessage()
 			throws InterruptedException, XmppStringprepException, SmackException.NotConnectedException, XMPPException {
 
-		user2_manager.getChatManager().addIncomingListener(new IncomingChatMessageListener() {
-
-			@Override
-			public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-				receivedMessage = message.getBody();
-				System.out.println(message.getBody());
-			}
+		user2_manager.addMessageListener((message) -> {
+			receivedMessage = message.getBody();
+			System.out.println(message.getBody());
 		});
 
-		user1_manager.sendMessage("test", user2_username);
+		user1_manager.sendMessage("test");
 
 		Thread.sleep(5000);
 
 		assertEquals("test", receivedMessage);
+	}
+	
+	@After
+	public void after(){
+		user1_manager.disconnect();
+		user2_manager.disconnect();
 	}
 
 }

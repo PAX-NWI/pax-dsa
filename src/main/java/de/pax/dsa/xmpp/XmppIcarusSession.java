@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.StringConverter;
+import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 
 /**
@@ -49,6 +50,21 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer) {
 		this.positionUpdateConsumer = positionUpdateConsumer;
+	}
+
+	@Override
+	public void sendElementAdded(ElementAddedMessage elementAddedMessage) {
+		
+	}
+
+	@Override
+	public void onElementAdded(Consumer<ElementAddedMessage> positionUpdateConsumer) {
+		
+	}
+
+	@Override
+	public void disconnect() {
+		xmppManager.disconnect();
 	}
 	
 }
