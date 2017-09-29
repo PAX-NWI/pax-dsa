@@ -24,7 +24,7 @@ public class MainApplication extends Application {
 		
 		context.set(Stage.class, stage);
 		
-		session = context.create(MockSessionImpl.class);
+		session = context.create(XmppIcarusSession.class);
 		
 		context.set(IIcarusSession.class, session);
 

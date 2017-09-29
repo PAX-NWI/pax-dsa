@@ -74,17 +74,20 @@ public class XmppManager {
 		EntityBareJid room = JidCreate.entityBareFrom(ROOM_NAME + ROOM_PROVIDER);
 		MultiUserChatManager manager = MultiUserChatManager.getInstanceFor(connection);
 		multiUserChat = manager.getMultiUserChat(room);
-	
-		MucEnterConfiguration.Builder enterConfig = multiUserChat.getEnterConfigurationBuilder(Resourcepart.from(username));
+
+		MucEnterConfiguration.Builder enterConfig = multiUserChat
+				.getEnterConfigurationBuilder(Resourcepart.from(username));
 		enterConfig.requestNoHistory();
-		
+
 		multiUserChat.join(enterConfig.build());
 
 		chatManager = ChatManager.getInstanceFor(connection);
 	}
-	
+
 	public void disconnect() {
-		connection.disconnect();
+		if (connection != null) {
+			connection.disconnect();
+		}
 	}
 
 	public void addMessageListener(MessageListener messageListener) {
@@ -110,6 +113,6 @@ public class XmppManager {
 		} catch (NotConnectedException | InterruptedException e) {
 			logger.error("Can not send Message to Chat", e);
 		}
-		
+
 	}
 }

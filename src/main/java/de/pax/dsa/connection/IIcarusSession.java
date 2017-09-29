@@ -21,4 +21,6 @@ public interface IIcarusSession {
 
 	String getUserName();
 
+	String getServer();
+
 }

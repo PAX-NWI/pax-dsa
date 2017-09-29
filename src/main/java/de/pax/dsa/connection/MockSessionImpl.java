@@ -83,4 +83,9 @@ public class MockSessionImpl implements IIcarusSession {
 		return user;
 	}
 
+	@Override
+	public String getServer() {
+		return "server.de";
+	}
+
 }

@@ -79,6 +79,8 @@ public class RootPaneController {
 		controller.onLogin(info -> session.connect(info.getUserName(), info.getPassword()));
 		
 		dialogStage.showAndWait();
+		
+		primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
 	}
 
 	@FXML

@@ -5,6 +5,9 @@ import java.util.function.Consumer;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
+import org.jxmpp.jid.Jid;
+import org.jxmpp.jid.parts.Localpart;
+import org.jxmpp.jid.parts.Resourcepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +42,12 @@ public class XmppIcarusSession implements IIcarusSession {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
 		xmppManager.addMessageListener(message -> {
+			Resourcepart sender = message.getFrom().getResourceOrEmpty();
+			if(sender.equals(user)){
+				//do not listen to own messages
+				return;
+			}
+			
 			Platform.runLater(() -> {
 				Object decode = StringConverter.decode(message.getBody());
 				if (decode instanceof PositionUpdatedMessage) {
@@ -80,6 +89,11 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public String getUserName() {
 		return user;
+	}
+
+	@Override
+	public String getServer() {
+		return SERVER;
 	}
 
 }
