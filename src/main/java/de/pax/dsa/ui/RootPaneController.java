@@ -83,7 +83,7 @@ public class RootPaneController {
 
 	@FXML
 	private void handleAddElement() {
-		gameTable.addCircle("addedId");
+		gameTable.addCircle();
 	}
 
 }

@@ -12,6 +12,7 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.connection.StringConverter;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import javafx.application.Platform;
 
 /**
  * Created by swinter on 22.04.2017.
@@ -27,22 +28,27 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<ElementAddedMessage> onElementAddedConsumer;
 
+	private String user;
+
 	@Override
 	public void connect(String user, String password) {
+		this.user = user;
 		try {
 			xmppManager = new XmppManager(SERVER, user, password);
 		} catch (XMPPException | IOException | InterruptedException | SmackException e) {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
 		xmppManager.addMessageListener(message -> {
-			Object decode = StringConverter.decode(message.getBody());
-			if (decode instanceof PositionUpdatedMessage) {
-				positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
-			} else if (decode instanceof ElementAddedMessage) {
-				onElementAddedConsumer.accept((ElementAddedMessage) decode);
-			} else {
-				logger.warn("Received non decodable message: " + message);
-			}
+			Platform.runLater(() -> {
+				Object decode = StringConverter.decode(message.getBody());
+				if (decode instanceof PositionUpdatedMessage) {
+					positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
+				} else if (decode instanceof ElementAddedMessage) {
+					onElementAddedConsumer.accept((ElementAddedMessage) decode);
+				} else {
+					logger.warn("Received non decodable message: " + message);
+				}
+			});
 		});
 	}
 
@@ -69,6 +75,11 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public void disconnect() {
 		xmppManager.disconnect();
+	}
+
+	@Override
+	public String getUserName() {
+		return user;
 	}
 
 }

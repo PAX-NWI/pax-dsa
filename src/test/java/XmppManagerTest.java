@@ -17,22 +17,22 @@ import de.pax.dsa.xmpp.XmppManager;
  * Created by swinter on 11.04.2017.
  */
 public class XmppManagerTest {
-	private static final String AT = "@";
+
+	// realistic test message to check correct processing of special characters
+	private static final String TEST_MESSAGE = "PositionUpdate [id=" + "C:/possible/path\\chars" + ", x=" + 10.3
+			+ ", y=" + 200 + "]";
 
 	static final String SERVER = "jabber.de";
 
 	private XmppManager user1_manager;
 	private XmppManager user2_manager;
 
-	private String user1_username;
-	private String user2_username;
-
 	private String receivedMessage;
 
 	@Before
 	public void setUp() throws InterruptedException, IOException, SmackException, XMPPException {
-		user1_username = System.getProperty("user1_username");
-		user2_username = System.getProperty("user2_username");
+		String user1_username = System.getProperty("user1_username");
+		String user2_username = System.getProperty("user2_username");
 
 		String user1_password = System.getProperty("user1_password");
 		String user2_password = System.getProperty("user2_password");
@@ -56,18 +56,18 @@ public class XmppManagerTest {
 
 		user2_manager.addMessageListener((message) -> {
 			receivedMessage = message.getBody();
-			System.out.println(message.getBody());
 		});
 
-		user1_manager.sendMessage("test");
+		user1_manager.sendMessage(TEST_MESSAGE);
 
+		// wait some time for the response
 		Thread.sleep(5000);
 
-		assertEquals("test", receivedMessage);
+		assertEquals(TEST_MESSAGE, receivedMessage);
 	}
-	
+
 	@After
-	public void after(){
+	public void after() {
 		user1_manager.disconnect();
 		user2_manager.disconnect();
 	}

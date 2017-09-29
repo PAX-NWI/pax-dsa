@@ -19,4 +19,6 @@ public interface IIcarusSession {
 
 	void onElementAdded(Consumer<ElementAddedMessage> positionUpdateConsumer);
 
+	String getUserName();
+
 }

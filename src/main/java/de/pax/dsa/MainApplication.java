@@ -1,6 +1,7 @@
 package de.pax.dsa;
 
 import de.pax.dsa.connection.IIcarusSession;
+import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
@@ -23,7 +24,7 @@ public class MainApplication extends Application {
 		
 		context.set(Stage.class, stage);
 		
-		session = context.create(XmppIcarusSession.class);
+		session = context.create(MockSessionImpl.class);
 		
 		context.set(IIcarusSession.class, session);
 
