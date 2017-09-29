@@ -49,11 +49,11 @@ public class RootPaneController {
 		
 		gameTable = context.create(GameTable.class);
 
-
-		doMovesButton.setOnAction(e -> {
-			gameTable.doMoves();
-		});
-
+//		doMovesButton.setOnAction(e -> {
+//			gameTable.doMoves();
+//		});
+		
+		primaryStage.setTitle("offline");
 	}
 
 	@FXML
@@ -80,6 +80,22 @@ public class RootPaneController {
 		
 		dialogStage.showAndWait();
 		
+		primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
+	}
+	
+	@FXML
+	private void login1(){
+		String user1 = System.getProperty("user1_username");
+		String password1 = System.getProperty("user1_password");
+		session.connect(user1, password1);
+		primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
+	}
+	
+	@FXML
+	private void login2(){
+		String user2 = System.getProperty("user2_username");
+		String password2 = System.getProperty("user2_password");
+		session.connect(user2, password2);
 		primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
 	}
 

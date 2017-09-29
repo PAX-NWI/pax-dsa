@@ -7,14 +7,13 @@ import javafx.util.Duration;
 
 public class Move2DTransition extends Transition {
 
-	private static final int SPEED_FACTOR = 5;
 	private I2DObject circle;
 	private double yDistance;
 	private double xDistance;
 	private double startX;
 	private double startY;
 
-	public Move2DTransition(I2DObject i2dObject, double toX, double toY) {
+	public Move2DTransition(I2DObject i2dObject, double toX, double toY , int speed) {
 		this.circle = i2dObject;
 		startX = i2dObject.getX();
 		startY = i2dObject.getY();
@@ -24,7 +23,7 @@ public class Move2DTransition extends Transition {
 
 		double dist = Math.sqrt(xDistance * xDistance + yDistance * yDistance);
 
-		setCycleDuration(Duration.millis(dist * SPEED_FACTOR));
+		setCycleDuration(Duration.millis(dist * speed));
 		
 		setInterpolator(Interpolator.LINEAR);
 	}

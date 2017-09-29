@@ -14,9 +14,9 @@ public class ElementAddedMessage {
 	private double h;
 	private String id;
 
-	public ElementAddedMessage(String id, ElementType circle, double x, double y, double w, double h) {
+	public ElementAddedMessage(String id, ElementType elementType, double x, double y, double w, double h) {
 		this.id = id;
-		this.elementType = circle;
+		this.elementType = elementType;
 		this.x = x;
 		this.y = y;
 		this.w = w;

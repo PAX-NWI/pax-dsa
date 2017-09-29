@@ -43,11 +43,11 @@ public class XmppIcarusSession implements IIcarusSession {
 		}
 		xmppManager.addMessageListener(message -> {
 			Resourcepart sender = message.getFrom().getResourceOrEmpty();
-			if(sender.equals(user)){
-				//do not listen to own messages
+			if (sender.equals(user)) {
+				// do not listen to own messages
 				return;
 			}
-			
+
 			Platform.runLater(() -> {
 				Object decode = StringConverter.decode(message.getBody());
 				if (decode instanceof PositionUpdatedMessage) {
@@ -63,7 +63,12 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void sendPositionUpdate(PositionUpdatedMessage positionUpdatedMessage) {
-		xmppManager.sendMessage(positionUpdatedMessage.toString());
+		if (xmppManager != null) {
+			xmppManager.sendMessage(positionUpdatedMessage.toString());
+		} else {
+			logger.warn("Not connected, can't send PositionUpdatedMessage");
+		}
+
 	}
 
 	@Override
@@ -73,7 +78,11 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void sendElementAdded(ElementAddedMessage elementAddedMessage) {
-		xmppManager.sendMessage(elementAddedMessage.toString());
+		if (xmppManager != null) {
+			xmppManager.sendMessage(elementAddedMessage.toString());
+		} else {
+			logger.warn("Not connected, can't send ElementAddedMessage");
+		}
 	}
 
 	@Override
@@ -83,7 +92,9 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void disconnect() {
-		xmppManager.disconnect();
+		if (xmppManager != null) {
+			xmppManager.disconnect();
+		}
 	}
 
 	@Override

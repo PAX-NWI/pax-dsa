@@ -25,7 +25,7 @@ public class MapRevealContent {
 
 	public Group build() {
 
-		ImageNode img = new ImageNode("file:src/main/resources/KibaMapSharped.png", 0, 0);
+		ImageNode img = new ImageNode("sharedmap","file:src/main/resources/KibaMapSharped.png", 0, 0);
 
 		int rectSizeX = 4;
 		int rectSizeY = 4;

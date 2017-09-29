@@ -8,12 +8,14 @@ import javafx.scene.image.ImageView;
 public class ImageNode extends Group implements I2DObject {
 
 	private ImageView iv;
+	private Image image;
 
-	public ImageNode(String path, double x, double y) {
-		this(path, new Image(path), x, y);
+	public ImageNode(String id,String path, double x, double y) {
+		this(id, new Image(path), x, y);
 	}
 
 	public ImageNode(String id, Image image, double x, double y) {
+		this.image = image;
 		iv = new ImageView(image);
 		iv.setX(x);
 		iv.setY(y);
@@ -22,6 +24,14 @@ public class ImageNode extends Group implements I2DObject {
 		getChildren().add(iv);
 	}
 
+	public double getWidth() {
+		return image.getWidth();
+	}
+	
+	public double getHeight() {
+		return image.getHeight();
+	}
+	
 	@Override
 	public double getX() {
 		return iv.getX();

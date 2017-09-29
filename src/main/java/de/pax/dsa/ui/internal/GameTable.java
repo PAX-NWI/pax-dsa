@@ -1,6 +1,5 @@
 package de.pax.dsa.ui.internal;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -12,17 +11,18 @@ import org.slf4j.Logger;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.ElementType;
+import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementMessageConverter;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
+import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
 import de.pax.dsa.ui.internal.imagednd.ImageDnDController;
 import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.MoveableCircle;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
-import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
@@ -37,6 +37,7 @@ import javafx.scene.layout.Pane;
  */
 public class GameTable {
 
+	private static final String IMAGE_FOLDER = "file:images/";
 	@Inject
 	private IIcarusSession session;
 
@@ -61,11 +62,15 @@ public class GameTable {
 
 		pane.getChildren().add(build());
 
-		ImageDnDController dnd = new ImageDnDController(respone -> {
-			ImageNode img = new ImageNode(getCreateStamp(respone.getName()), respone.getImage(), respone.getX(),
-					respone.getY());
+		ImageDnDController dnd = new ImageDnDController(response -> {
+			String identifier = IdBuilder.build(response.getName(), session.getUserName());
+			double x = response.getX();
+			double y = response.getY();
+			ImageNode img = new ImageNode(identifier, response.getImage(), x, y);
 			DragEnabler.enableDrag(img, session::sendPositionUpdate);
 			elementGroup.getChildren().add(img);
+			session.sendElementAdded(
+					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, img.getWidth(), img.getHeight()));
 		});
 
 		pane.setOnDragDropped(dnd::mouseDragDropped);
@@ -74,47 +79,49 @@ public class GameTable {
 	}
 
 	public void addCircle() {
-		MoveableCircle circle = new MoveableCircle(getCreateStamp("circle"), 50, 50, 20);
+		MoveableCircle circle = new MoveableCircle(IdBuilder.build("circle", session.getUserName()), 50, 50, 10);
 		elementGroup.getChildren().add(circle);
 		DragEnabler.enableDrag(circle, session::sendPositionUpdate);
 		session.sendElementAdded(ElementMessageConverter.createCircleAddedMessage(circle));
 	}
 
-	private String getCreateStamp(String id) {
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		long time = timestamp.getTime();
-		String separator = "-:-";
-		return id + separator + session.getUserName() + separator + Long.toString(time);
-	}
-
 	public Group build() {
 		Consumer<PositionUpdatedMessage> sendPositionUpdate = session::sendPositionUpdate;
 
-		nodeA = new TwoStageMoveNode("nodeA", 100, 100);
-		nodeA.setMoveTarget(100, 300);
-		nodeB = new TwoStageMoveNode("nodeB", 200, 100);
-		nodeB.setMoveTarget(200, 500);
-		ImageNode img = new ImageNode("file:src/main/resources/festum.png", 300, 200);
-
-		DragEnabler.enableDrag(nodeA, sendPositionUpdate);
-		DragEnabler.enableDrag(nodeB, sendPositionUpdate);
-		DragEnabler.enableDrag(img, sendPositionUpdate);
-
-		elementGroup = new Group(img, nodeA, nodeB);
+//		nodeA = new TwoStageMoveNode("nodeA", 100, 100);
+//		nodeA.setMoveTarget(100, 300);
+//		nodeB = new TwoStageMoveNode("nodeB", 200, 100);
+//		nodeB.setMoveTarget(200, 500);
+//		ImageNode img = new ImageNode("festumimage","file:src/main/resources/festum.png", 300, 200);
+//
+//		DragEnabler.enableDrag(nodeA, sendPositionUpdate);
+//		DragEnabler.enableDrag(nodeB, sendPositionUpdate);
+//		DragEnabler.enableDrag(img, sendPositionUpdate);
+//
+//		elementGroup = new Group(img, nodeA, nodeB);
+		
+		elementGroup = new Group();
 
 		session.onPositionUpdate(positionUpdate -> {
 			I2DObject node = getFromGroup(positionUpdate.getId(), elementGroup);
 			logger.info("received " + positionUpdate);
 
-			new Move2DTransition(node, positionUpdate.getX(), positionUpdate.getY()).play();
+			new Move2DTransition(node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
 		});
 
-		session.onElementAdded(elementAddedMessage -> {
-			ElementType elementType = elementAddedMessage.getElementType();
+		session.onElementAdded(message -> {
+			ElementType elementType = message.getElementType();
 			if (elementType == ElementType.CIRCLE) {
-				MoveableCircle newCircle = ElementMessageConverter.circleFromMessage(elementAddedMessage);
+				MoveableCircle newCircle = ElementMessageConverter.circleFromMessage(message);
 				elementGroup.getChildren().add(newCircle);
 				DragEnabler.enableDrag(newCircle, sendPositionUpdate);
+			} else if (elementType == ElementType.IMAGE) {
+				String id = message.getId();
+				String name = IdBuilder.getName(id);
+				ImageNode imageNode = new ImageNode(id, IMAGE_FOLDER + name, message.getX(), message.getY());
+				elementGroup.getChildren().add(imageNode);
+				DragEnabler.enableDrag(imageNode, sendPositionUpdate);
+				
 			} else {
 				logger.warn("Unknown element type {}", elementType);
 			}

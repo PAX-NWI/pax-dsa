@@ -55,13 +55,13 @@ public class XmppManager {
 			throws XMPPException, IOException, InterruptedException, SmackException {
 		this.server = server;
 		logger.debug("Initializing connection to server {}", server);
-		SmackConfiguration.DEBUG = true;
+	//	SmackConfiguration.DEBUG = true;
 
 		XMPPTCPConnectionConfiguration.Builder connectionConfig = XMPPTCPConnectionConfiguration.builder();
 		connectionConfig.setXmppDomain(server);
 		connectionConfig.setResource("IcarusClient");
 		connectionConfig.setUsernameAndPassword(username, password);
-		connectionConfig.setDebuggerEnabled(true);
+		//connectionConfig.setDebuggerEnabled(true);
 
 		connection = new XMPPTCPConnection(connectionConfig.build());
 
