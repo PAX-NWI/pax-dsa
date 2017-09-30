@@ -1,7 +1,6 @@
 package de.pax.dsa;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.connection.MockSessionImpl;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
@@ -29,7 +28,7 @@ public class MainApplication extends Application {
 		context.set(IIcarusSession.class, session);
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
-		Pane rootPane = (Pane) fxmlLoader.load(getClass().getResource("ui/RootPane.fxml").openStream());
+		Pane rootPane = fxmlLoader.load(getClass().getResource("/fxml/RootPane.fxml").openStream());
 		context.wire(fxmlLoader.getController());
 
 		Scene scene = new Scene(rootPane);

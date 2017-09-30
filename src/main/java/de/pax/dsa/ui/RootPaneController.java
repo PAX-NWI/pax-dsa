@@ -59,7 +59,7 @@ public class RootPaneController {
 	@FXML
 	private void handleLogin() {
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(LoginDialogController.class.getResource("LoginDialog.fxml"));
+		loader.setLocation(LoginDialogController.class.getResource("/fxml/LoginDialog.fxml"));
 		AnchorPane page = null;
 		try {
 			page = loader.load();
