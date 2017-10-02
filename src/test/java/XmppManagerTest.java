@@ -1,6 +1,7 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.jivesoftware.smack.SmackException;
@@ -64,6 +65,11 @@ public class XmppManagerTest {
 		Thread.sleep(5000);
 
 		assertEquals(TEST_MESSAGE, receivedMessage);
+//			
+//		File file = new File("src/main/resources/KibaMap.png");
+//		user1_manager.sendFile("pax2", file);
+//		
+//		Thread.sleep(5000);
 	}
 
 	@After

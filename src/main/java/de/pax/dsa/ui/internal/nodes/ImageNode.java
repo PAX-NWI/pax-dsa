@@ -24,6 +24,10 @@ public class ImageNode extends Group implements I2DObject {
 		getChildren().add(iv);
 	}
 
+	public void setImage(Image image) {
+		iv.setImage(image);
+	}
+
 	public double getWidth() {
 		return image.getWidth();
 	}

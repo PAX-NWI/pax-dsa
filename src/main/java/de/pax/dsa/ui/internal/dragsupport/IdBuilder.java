@@ -11,15 +11,20 @@ public class IdBuilder {
 
 	private static final String SEPARATOR = "-:-";
 
-	public static String build(String name, String userName) {
+	public static String build(String name, String owner) {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
 		long time = timestamp.getTime();
-		return name + SEPARATOR + userName + SEPARATOR + Long.toString(time);
+		return name + SEPARATOR + owner + SEPARATOR + Long.toString(time);
 	}
 
 	public static String getName(String string) {
 		String[] split = string.split(SEPARATOR);
 		return split[0];
+	}
+	
+	public static String getOwner(String string) {
+		String[] split = string.split(SEPARATOR);
+		return split[1];
 	}
 
 }

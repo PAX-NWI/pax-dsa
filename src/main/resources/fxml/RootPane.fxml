@@ -13,8 +13,8 @@
             <Button mnemonicParsing="false" onAction="#handleLogin" text="Login" />
             <Button mnemonicParsing="false" onAction="#handleAddElement" text="Add Marker" />
 <!--             <Button fx:id="doMovesButton" maxWidth="1.7976931348623157E308" mnemonicParsing="false" text="Do Moves" /> -->
-<!--             <Button mnemonicParsing="false" onAction="#login1" text="Login as TestUser1" /> -->
-<!--             <Button mnemonicParsing="false" onAction="#login2" text="Login as TestUser2" /> -->
+            <Button mnemonicParsing="false" onAction="#login1" text="Login as TestUser1" />
+            <Button mnemonicParsing="false" onAction="#login2" text="Login as TestUser2" />
          </children>
          <BorderPane.margin>
             <Insets />

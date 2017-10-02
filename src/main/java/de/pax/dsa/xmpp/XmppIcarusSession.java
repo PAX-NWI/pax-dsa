@@ -1,20 +1,20 @@
 package de.pax.dsa.xmpp;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
-import org.jxmpp.jid.Jid;
-import org.jxmpp.jid.parts.Localpart;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.connection.StringConverter;
+import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.RequestFileMessage;
 import javafx.application.Platform;
 
 /**
@@ -33,6 +33,10 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private String user;
 
+	private Consumer<RequestFileMessage> onRequestFileConsumer;
+
+	private Consumer<File> onFileReceivedConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
@@ -49,16 +53,20 @@ public class XmppIcarusSession implements IIcarusSession {
 			}
 
 			Platform.runLater(() -> {
-				Object decode = StringConverter.decode(message.getBody());
+				Object decode = MessageConverter.decode(message.getBody());
 				if (decode instanceof PositionUpdatedMessage) {
 					positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
 				} else if (decode instanceof ElementAddedMessage) {
 					onElementAddedConsumer.accept((ElementAddedMessage) decode);
+				} else if (decode instanceof RequestFileMessage) {
+					onRequestFileConsumer.accept((RequestFileMessage) decode);
 				} else {
 					logger.warn("Received non decodable message: " + message);
 				}
 			});
 		});
+		
+		xmppManager.onFileReceived(onFileReceivedConsumer);
 	}
 
 	@Override
@@ -68,7 +76,6 @@ public class XmppIcarusSession implements IIcarusSession {
 		} else {
 			logger.warn("Not connected, can't send PositionUpdatedMessage");
 		}
-
 	}
 
 	@Override
@@ -88,6 +95,34 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public void onElementAdded(Consumer<ElementAddedMessage> onElementAddedConsumer) {
 		this.onElementAddedConsumer = onElementAddedConsumer;
+	}
+
+	@Override
+	public void sendRequestFile(RequestFileMessage requestFileMessage) {
+		if (xmppManager != null) {
+			xmppManager.sendMessage(requestFileMessage.toString());
+		} else {
+			logger.warn("Not connected, can't send ElementAddedMessage");
+		}
+	}
+
+	@Override
+	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
+		this.onRequestFileConsumer = onRequestFileConsumer;
+	}
+	
+	@Override
+	public void sendFile(String buddyJID, File file) {
+		if (xmppManager != null) {
+			xmppManager.sendFile(buddyJID, file);
+		} else {
+			logger.warn("Not connected, can't send File");
+		}
+	}
+	
+	@Override
+	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
+		this.onFileReceivedConsumer = onFileReceivedConsumer;
 	}
 
 	@Override

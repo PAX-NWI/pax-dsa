@@ -39,4 +39,8 @@ public class PositionUpdatedMessage {
 	public String toString() {
 		return "PositionUpdate [id=" + id + ", x=" + x + ", y=" + y + "]";
 	}
+
+	public static String startsWith() {
+		return "PositionUpdate [";
+	}
 }

@@ -1,5 +1,6 @@
 package de.pax.dsa.connection;
 
+import java.io.File;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
@@ -9,6 +10,7 @@ import org.slf4j.Logger;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.RequestFileMessage;
 import javafx.application.Platform;
 
 public class MockSessionImpl implements IIcarusSession {
@@ -20,30 +22,6 @@ public class MockSessionImpl implements IIcarusSession {
 	private Consumer<PositionUpdatedMessage> positionUpdateConsumer;
 
 	public MockSessionImpl() {
-
-//		new Thread() {
-//			@Override
-//			public void run() {
-//				Platform.runLater(() -> {
-//					sleep();
-//					elementAddedConsumer
-//							.accept(new ElementAddedMessage("test-id-1337", ElementType.CIRCLE, 100, 100, 20, 20));
-//					sleep();
-//					positionUpdateConsumer.accept(new PositionUpdatedMessage("test-id-1337", 50, 50));
-//					sleep();
-//					positionUpdateConsumer.accept(new PositionUpdatedMessage("test-id-1337", 150, 150));
-//				});
-//			}
-//
-//			private void sleep() {
-//				try {
-//					sleep(2000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}.start();
-
 	}
 
 	@Override
@@ -86,6 +64,30 @@ public class MockSessionImpl implements IIcarusSession {
 	@Override
 	public String getServer() {
 		return "server.de";
+	}
+
+	@Override
+	public void sendRequestFile(RequestFileMessage requestFileMessage) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendFile(String buddyJID, File file) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

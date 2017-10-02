@@ -1,9 +1,11 @@
 package de.pax.dsa.connection;
 
+import java.io.File;
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.RequestFileMessage;
 
 public interface IIcarusSession {
 
@@ -22,5 +24,13 @@ public interface IIcarusSession {
 	String getUserName();
 
 	String getServer();
+
+	void sendRequestFile(RequestFileMessage requestFileMessage);
+
+	void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer);
+
+	void onFileReceived(Consumer<File> onFileReceivedConsumer);
+
+	void sendFile(String buddyJID, File file);
 
 }

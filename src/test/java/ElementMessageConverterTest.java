@@ -1,10 +1,9 @@
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
-import de.pax.dsa.model.messages.ElementMessageConverter;
 import de.pax.dsa.ui.internal.nodes.MoveableCircle;
 
 public class ElementMessageConverterTest {
@@ -14,7 +13,8 @@ public class ElementMessageConverterTest {
 
 		MoveableCircle circle = new MoveableCircle("id", 2, 3.0, 4);
 
-		ElementAddedMessage message = ElementMessageConverter.createCircleAddedMessage(circle);
+		ElementAddedMessage message = new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(), circle.getY(), circle.getRadius(),
+		circle.getRadius());
 
 		assertEquals(circle.getId(), message.getId());
 		assertEquals(ElementType.CIRCLE, message.getElementType());
@@ -29,7 +29,7 @@ public class ElementMessageConverterTest {
 
 		ElementAddedMessage message = new ElementAddedMessage("id", ElementType.CIRCLE, 2, 3.0, 4, 4);
 
-		MoveableCircle circle = ElementMessageConverter.circleFromMessage(message);
+		MoveableCircle circle = new MoveableCircle(message.getId(), message.getX(), message.getY(), message.getW());
 
 		assertEquals(message.getId(), circle.getId());
 		assertEquals(message.getX(), circle.getX(), 0);

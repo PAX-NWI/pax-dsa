@@ -59,10 +59,12 @@ public class ElementAddedMessage {
 
 	@Override
 	public String toString() {
-		return "ElementAddedMessage [elementType=" + elementType + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h
+		return "ElementAdded [elementType=" + elementType + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h
 				+ ", id=" + id + "]";
 	}
 
-
+	public static String startsWith() {
+		return "ElementAdded [";
+	}
 
 }
