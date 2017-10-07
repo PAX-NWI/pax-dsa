@@ -2,10 +2,12 @@ package de.pax.dsa.model.messages;
 
 import java.util.Map;
 
+import org.jivesoftware.smack.packet.Message;
+
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.StringMapper;
 
-public class ElementAddedMessage {
+public class ElementAddedMessage implements IMessage {
 
 	private ElementType elementType;
 	private double x;
@@ -13,6 +15,7 @@ public class ElementAddedMessage {
 	private double w;
 	private double h;
 	private String id;
+	private String sender;
 
 	public ElementAddedMessage(String id, ElementType elementType, double x, double y, double w, double h) {
 		this.id = id;
@@ -22,9 +25,10 @@ public class ElementAddedMessage {
 		this.w = w;
 		this.h = h;
 	}
-	
-	public ElementAddedMessage(String  string) {
-		Map<String, String> map = StringMapper.keyValueListStringToMap(string);
+
+	public ElementAddedMessage(Message message, String sender) {
+		this.sender = sender;
+		Map<String, String> map = StringMapper.keyValueListStringToMap(message.getBody());
 		this.id = map.get("id");
 		this.elementType = ElementType.valueOf(map.get("elementType"));
 		this.x = Double.parseDouble(map.get("x"));
@@ -36,7 +40,12 @@ public class ElementAddedMessage {
 	public String getId() {
 		return id;
 	}
-	
+
+	@Override
+	public String getSender() {
+		return sender;
+	}
+
 	public ElementType getElementType() {
 		return elementType;
 	}
@@ -59,8 +68,8 @@ public class ElementAddedMessage {
 
 	@Override
 	public String toString() {
-		return "ElementAdded [elementType=" + elementType + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h
-				+ ", id=" + id + "]";
+		return "ElementAdded [elementType=" + elementType + ", x=" + x + ", y=" + y + ", w=" + w + ", h=" + h + ", id="
+				+ id + "]";
 	}
 
 	public static String startsWith() {

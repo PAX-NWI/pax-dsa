@@ -11,7 +11,7 @@ public class MoveableCircle extends Circle implements I2DObject {
 		setId(id);
 		setFill(Color.CORNFLOWERBLUE);
 	}
-
+	
 	@Override
 	public double getX() {
 		return getCenterX();

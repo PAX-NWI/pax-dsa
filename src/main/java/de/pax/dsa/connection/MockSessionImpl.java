@@ -7,11 +7,11 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 
-import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.IMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
-import javafx.application.Platform;
 
 public class MockSessionImpl implements IIcarusSession {
 
@@ -35,16 +35,6 @@ public class MockSessionImpl implements IIcarusSession {
 		this.positionUpdateConsumer = positionUpdateConsumer;
 	}
 
-	@Override
-	public void sendPositionUpdate(PositionUpdatedMessage positionUpdatedMessage) {
-		// think about using one send method for all messages
-		logger.info("Sending: {}", positionUpdatedMessage.toString());
-	}
-
-	@Override
-	public void sendElementAdded(ElementAddedMessage elementAddedMessage) {
-		logger.info("Sending: {}", elementAddedMessage.toString());
-	}
 
 	@Override
 	public void onElementAdded(Consumer<ElementAddedMessage> elementAddedConsumer) {
@@ -67,12 +57,6 @@ public class MockSessionImpl implements IIcarusSession {
 	}
 
 	@Override
-	public void sendRequestFile(RequestFileMessage requestFileMessage) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
 	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
 		// TODO Auto-generated method stub
 		
@@ -86,6 +70,18 @@ public class MockSessionImpl implements IIcarusSession {
 
 	@Override
 	public void sendFile(String buddyJID, File file) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void sendMessage(IMessage message) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer) {
 		// TODO Auto-generated method stub
 		
 	}

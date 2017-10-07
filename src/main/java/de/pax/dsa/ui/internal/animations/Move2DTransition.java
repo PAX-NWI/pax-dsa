@@ -1,22 +1,22 @@
 package de.pax.dsa.ui.internal.animations;
 
-import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
+import javafx.scene.Node;
 import javafx.util.Duration;
 
 public class Move2DTransition extends Transition {
 
-	private I2DObject circle;
+	private Node node;
 	private double yDistance;
 	private double xDistance;
 	private double startX;
 	private double startY;
 
-	public Move2DTransition(I2DObject i2dObject, double toX, double toY , int speed) {
-		this.circle = i2dObject;
-		startX = i2dObject.getX();
-		startY = i2dObject.getY();
+	public Move2DTransition(Node node, double toX, double toY , int speed) {
+		this.node = node;
+		startX = node.getLayoutX();
+		startY = node.getLayoutY();
 
 		yDistance = toY - startY;
 		xDistance = toX - startX;
@@ -30,7 +30,7 @@ public class Move2DTransition extends Transition {
 
 	@Override
 	protected void interpolate(double frac) {
-		circle.setX(startX + (xDistance * frac));
-		circle.setY(startY + (yDistance * frac));
+		node.setLayoutX(startX + (xDistance * frac));
+		node.setLayoutY(startY + (yDistance * frac));
 	}
 }

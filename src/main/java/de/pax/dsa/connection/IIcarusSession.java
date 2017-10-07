@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.IMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 
@@ -15,17 +17,11 @@ public interface IIcarusSession {
 
 	void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer);
 
-	void sendPositionUpdate(PositionUpdatedMessage positionUpdatedMessage);
-
-	void sendElementAdded(ElementAddedMessage elementAddedMessage);
-
 	void onElementAdded(Consumer<ElementAddedMessage> positionUpdateConsumer);
 
 	String getUserName();
 
 	String getServer();
-
-	void sendRequestFile(RequestFileMessage requestFileMessage);
 
 	void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer);
 
@@ -33,4 +29,9 @@ public interface IIcarusSession {
 
 	void sendFile(String buddyJID, File file);
 
+	void sendMessage(IMessage message);
+
+	void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer);
+
 }
+ 

@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.IMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import javafx.application.Platform;
@@ -37,6 +39,8 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<File> onFileReceivedConsumer;
 
+	private Consumer<ElementRemovedMessage> onElementRemovedConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
@@ -53,14 +57,18 @@ public class XmppIcarusSession implements IIcarusSession {
 			}
 
 			Platform.runLater(() -> {
-				Object decode = MessageConverter.decode(message.getBody());
+				Object decode = MessageConverter.decode(message, sender.toString());
 				if (decode instanceof PositionUpdatedMessage) {
 					positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
 				} else if (decode instanceof ElementAddedMessage) {
 					onElementAddedConsumer.accept((ElementAddedMessage) decode);
 				} else if (decode instanceof RequestFileMessage) {
 					onRequestFileConsumer.accept((RequestFileMessage) decode);
-				} else {
+				}  else if (decode instanceof ElementRemovedMessage) {
+					onElementRemovedConsumer.accept((ElementRemovedMessage) decode);
+				}
+				
+				else {
 					logger.warn("Received non decodable message: " + message);
 				}
 			});
@@ -68,28 +76,20 @@ public class XmppIcarusSession implements IIcarusSession {
 		
 		xmppManager.onFileReceived(onFileReceivedConsumer);
 	}
-
+	
 	@Override
-	public void sendPositionUpdate(PositionUpdatedMessage positionUpdatedMessage) {
+	public void sendMessage(IMessage message){
 		if (xmppManager != null) {
-			xmppManager.sendMessage(positionUpdatedMessage.toString());
+			xmppManager.sendMessage(message.toString());
 		} else {
-			logger.warn("Not connected, can't send PositionUpdatedMessage");
+			logger.warn("Not connected, can't send {}", message.toString());
 		}
 	}
+
 
 	@Override
 	public void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer) {
 		this.positionUpdateConsumer = positionUpdateConsumer;
-	}
-
-	@Override
-	public void sendElementAdded(ElementAddedMessage elementAddedMessage) {
-		if (xmppManager != null) {
-			xmppManager.sendMessage(elementAddedMessage.toString());
-		} else {
-			logger.warn("Not connected, can't send ElementAddedMessage");
-		}
 	}
 
 	@Override
@@ -98,17 +98,13 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void sendRequestFile(RequestFileMessage requestFileMessage) {
-		if (xmppManager != null) {
-			xmppManager.sendMessage(requestFileMessage.toString());
-		} else {
-			logger.warn("Not connected, can't send ElementAddedMessage");
-		}
-	}
-
-	@Override
 	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
 		this.onRequestFileConsumer = onRequestFileConsumer;
+	}
+	
+	@Override
+	public void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer) {
+		this.onElementRemovedConsumer = onElementRemovedConsumer;
 	}
 	
 	@Override
