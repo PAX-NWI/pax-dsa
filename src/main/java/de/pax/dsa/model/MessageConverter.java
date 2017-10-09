@@ -4,6 +4,8 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementToBackMessage;
+import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 
@@ -19,6 +21,10 @@ public class MessageConverter {
 			return new RequestFileMessage(message, sender);
 		} else if (body.startsWith(ElementRemovedMessage.startsWith())) {
 			return new ElementRemovedMessage(message, sender);
+		} else if (body.startsWith(ElementToTopMessage.startsWith())) {
+			return new ElementToTopMessage(message, sender);
+		} else if (body.startsWith(ElementToBackMessage.startsWith())) {
+			return new ElementToBackMessage(message, sender);
 		}
 		return null;
 	}

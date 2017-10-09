@@ -13,6 +13,8 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementToBackMessage;
+import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
@@ -64,7 +66,6 @@ public class GameTable {
 		pane.getChildren().add(grid);
 
 		gameTableElements = new GameTableElements(pane);
-		
 
 		ImageDnDController dnd = new ImageDnDController(response -> {
 			String identifier = IdBuilder.build(response.getName(), session.getUserName());
@@ -73,13 +74,10 @@ public class GameTable {
 			ImageNode img = new ImageNode(identifier, response.getImage(), x, y);
 			DragEnabler.enableDrag(img, session::sendMessage);
 			gameTableElements.add(img);
-			
-			ContextMenuProvider context = new ContextMenuProvider(img);
-			context.onDelete(node -> {
-				session.sendMessage(new ElementRemovedMessage(node.getId()));
-				gameTableElements.remove(node);
-			});
-			
+
+			addContextMenu(img);
+
+
 			session.sendMessage(
 					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, img.getWidth(), img.getHeight()));
 		});
@@ -88,7 +86,23 @@ public class GameTable {
 		pane.setOnDragOver(dnd::mouseDragOver);
 
 		registerToSessionEvents();
-		
+
+	}
+
+	private void addContextMenu(Node master) {
+		ContextMenuProvider context = new ContextMenuProvider(master);
+		context.addEntry("Delete", node -> {
+			session.sendMessage(new ElementRemovedMessage(node.getId()));
+			gameTableElements.remove(node);
+		});
+		context.addEntry("To Top", node -> {
+			session.sendMessage(new ElementToTopMessage(node.getId()));
+			node.toFront();
+		});
+		context.addEntry("To Back", node -> {
+			session.sendMessage(new ElementToBackMessage(node.getId()));
+			node.toBack();
+		});
 	}
 
 	public void addCircle() {
@@ -96,13 +110,7 @@ public class GameTable {
 		gameTableElements.add(circle);
 		DragEnabler.enableDrag(circle, session::sendMessage);
 
-		
-		
-		ContextMenuProvider context = new ContextMenuProvider(circle);
-		context.onDelete(node -> {
-			session.sendMessage(new ElementRemovedMessage(node.getId()));
-			gameTableElements.remove(node);
-		});
+		addContextMenu(circle);
 
 		session.sendMessage(new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(), circle.getY(),
 				circle.getRadius(), circle.getRadius()));
@@ -121,7 +129,6 @@ public class GameTable {
 		//
 		// elementGroup = new Group(img, nodeA, nodeB);
 
-	
 		session.onPositionUpdate(positionUpdate -> {
 			Node node = gameTableElements.getById(positionUpdate.getId());
 			new Move2DTransition((I2DObject) node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
@@ -134,6 +141,7 @@ public class GameTable {
 						message.getW());
 				gameTableElements.add(newCircle);
 				DragEnabler.enableDrag(newCircle, sendPositionUpdate);
+				addContextMenu(newCircle);
 			} else if (elementType == ElementType.IMAGE) {
 				String id = message.getId();
 				String name = IdBuilder.getName(id);
@@ -147,13 +155,22 @@ public class GameTable {
 				}
 				gameTableElements.add(imageNode);
 				DragEnabler.enableDrag(imageNode, sendPositionUpdate);
+				addContextMenu(imageNode);
 			} else {
 				logger.warn("Unknown element type {}", elementType);
 			}
 		});
-		
+
 		session.onElementRemoved(elementRemovedMessage -> {
 			gameTableElements.remove(gameTableElements.getById(elementRemovedMessage.getId()));
+		});
+		
+		session.onElementToTop(elementToTopMessage -> {
+			gameTableElements.getById(elementToTopMessage.getId()).toFront();
+		});
+		
+		session.onElementToBack(elementToBackMessage -> {
+			gameTableElements.getById(elementToBackMessage.getId()).toBack();
 		});
 
 		session.onRequestFile(new Consumer<RequestFileMessage>() {
@@ -181,7 +198,5 @@ public class GameTable {
 		nodeA.commitMove();
 		nodeB.commitMove();
 	}
-
-
 
 }

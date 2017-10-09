@@ -5,6 +5,8 @@ import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementToBackMessage;
+import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
@@ -32,6 +34,10 @@ public interface IIcarusSession {
 	void sendMessage(IMessage message);
 
 	void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer);
+
+	void onElementToTop(Consumer<ElementToTopMessage> onElementToTopConsumer);
+
+	void onElementToBack(Consumer<ElementToBackMessage> onElementToBackConsumer);
 
 }
  

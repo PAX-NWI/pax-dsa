@@ -34,10 +34,10 @@ public class ContextMenuProvider {
 		});
 	}
 
-	public void onDelete(Consumer<Node> deleteHandler) {
-		MenuItem delete = new MenuItem("Delete");
-		contextMenu.getItems().addAll(delete);
-		delete.setOnAction(event -> deleteHandler.accept(node));
+	public void addEntry(String text, Consumer<Node> consumer) {
+		MenuItem onTopItem = new MenuItem(text);
+		contextMenu.getItems().addAll(onTopItem);
+		onTopItem.setOnAction(event -> consumer.accept(node));
 	}
 
 }

@@ -14,6 +14,8 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementToBackMessage;
+import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
@@ -41,6 +43,10 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<ElementRemovedMessage> onElementRemovedConsumer;
 
+	private Consumer<ElementToTopMessage> onElementToTopConsumer;
+
+	private Consumer<ElementToBackMessage> onElementToBackConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
@@ -65,27 +71,29 @@ public class XmppIcarusSession implements IIcarusSession {
 					onElementAddedConsumer.accept((ElementAddedMessage) decode);
 				} else if (decode instanceof RequestFileMessage) {
 					onRequestFileConsumer.accept((RequestFileMessage) decode);
-				}  else if (decode instanceof ElementRemovedMessage) {
+				} else if (decode instanceof ElementRemovedMessage) {
 					onElementRemovedConsumer.accept((ElementRemovedMessage) decode);
-				}
-				else {
+				} else if (decode instanceof ElementToTopMessage) {
+					onElementToTopConsumer.accept((ElementToTopMessage) decode);
+				} else if (decode instanceof ElementToBackMessage) {
+					onElementToBackConsumer.accept((ElementToBackMessage) decode);
+				}else {
 					logger.warn("Received non decodable message: " + message);
 				}
 			});
 		});
-		
+
 		xmppManager.onFileReceived(onFileReceivedConsumer);
 	}
-	
+
 	@Override
-	public void sendMessage(IMessage message){
+	public void sendMessage(IMessage message) {
 		if (xmppManager != null) {
 			xmppManager.sendMessage(message.toString());
 		} else {
 			logger.warn("Not connected, can't send {}", message.toString());
 		}
 	}
-
 
 	@Override
 	public void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer) {
@@ -101,12 +109,22 @@ public class XmppIcarusSession implements IIcarusSession {
 	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
 		this.onRequestFileConsumer = onRequestFileConsumer;
 	}
-	
+
 	@Override
 	public void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer) {
 		this.onElementRemovedConsumer = onElementRemovedConsumer;
 	}
 	
+	@Override
+	public void onElementToTop(Consumer<ElementToTopMessage> onElementToTopConsumer) {
+		this.onElementToTopConsumer = onElementToTopConsumer;
+	}
+	
+	@Override
+	public void onElementToBack(Consumer<ElementToBackMessage> onElementToBackConsumer) {
+		this.onElementToBackConsumer = onElementToBackConsumer;
+	}
+
 	@Override
 	public void sendFile(String buddyJID, File file) {
 		if (xmppManager != null) {
@@ -115,7 +133,7 @@ public class XmppIcarusSession implements IIcarusSession {
 			logger.warn("Not connected, can't send File");
 		}
 	}
-	
+
 	@Override
 	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
 		this.onFileReceivedConsumer = onFileReceivedConsumer;
