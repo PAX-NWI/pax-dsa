@@ -10,13 +10,11 @@ public class RequestFileMessage implements IMessage {
 
 	private String owner;
 	private String fileName;
-	private String requester;
 	private String sender;
 
-	public RequestFileMessage(String owner, String fileName, String requester) {
+	public RequestFileMessage(String owner, String fileName) {
 		this.owner = owner;
 		this.fileName = fileName;
-		this.requester = requester;
 	}
 
 	public RequestFileMessage(Message message, String sender) {
@@ -24,7 +22,6 @@ public class RequestFileMessage implements IMessage {
 		Map<String, String> map = StringMapper.keyValueListStringToMap(message.getBody());
 		this.owner = map.get("owner");
 		this.fileName = map.get("fileName");
-		this.requester = map.get("requester");
 	}
 
 	@Override
@@ -39,14 +36,10 @@ public class RequestFileMessage implements IMessage {
 	public String getFileName() {
 		return fileName;
 	}
-	
-	public String getRequester() {
-		return requester;
-	}
 
 	@Override
 	public String toString() {
-		return "RequestFile [owner=" + owner + ", fileName=" + fileName + ", requester=" + requester + "]";
+		return "RequestFile [owner=" + owner + ", fileName=" + fileName + "]";
 	}
 
 	public static String startsWith() {

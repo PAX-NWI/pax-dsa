@@ -148,7 +148,7 @@ public class GameTable {
 				ImageNode imageNode = null;
 				if (!new File(IMAGE_FOLDER + name).exists()) {
 					String owner = IdBuilder.getOwner(id);
-					session.sendMessage(new RequestFileMessage(owner, name, session.getUserName()));
+					session.sendMessage(new RequestFileMessage(owner, name));
 					imageNode = new ImageNode(id, FILE + IMAGE_FOLDER + "waiting.gif", message.getX(), message.getY());
 				} else {
 					imageNode = new ImageNode(id, FILE + IMAGE_FOLDER + name, message.getX(), message.getY());
@@ -173,16 +173,12 @@ public class GameTable {
 			gameTableElements.getById(elementToBackMessage.getId()).toBack();
 		});
 
-		session.onRequestFile(new Consumer<RequestFileMessage>() {
-
-			@Override
-			public void accept(RequestFileMessage t) {
-				// if the owner of the file is me i have to send it
-				if (t.getOwner().equals(session.getUserName())) {
-					session.sendFile(t.getRequester(), new File(IMAGE_FOLDER + t.getFileName()));
-				}
-
+		session.onRequestFile(t -> {
+			// if the owner of the file is me i have to send it
+			if (t.getOwner().equals(session.getUserName())) {
+				session.sendFile(t.getSender(), new File(IMAGE_FOLDER + t.getFileName()));
 			}
+
 		});
 
 		session.onFileReceived(f -> {

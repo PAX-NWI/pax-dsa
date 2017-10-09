@@ -3,7 +3,6 @@ package de.pax.dsa.ui.internal.animations;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import javafx.animation.Interpolator;
 import javafx.animation.Transition;
-import javafx.scene.Node;
 import javafx.util.Duration;
 
 public class Move2DTransition extends Transition {

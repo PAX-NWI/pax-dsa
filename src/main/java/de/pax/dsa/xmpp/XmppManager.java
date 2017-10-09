@@ -33,6 +33,8 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javafx.application.Platform;
+
 /**
  * Smack Documentation:
  * https://github.com/igniterealtime/Smack/blob/master/documentation/index.md
@@ -115,9 +117,12 @@ public class XmppManager {
 						}
 						sleep(1000);
 					}
-					if (onFileReceivedConsumer != null) {
-						onFileReceivedConsumer.accept(file);
-					}
+
+					Platform.runLater(() -> {
+						if (onFileReceivedConsumer != null) {
+							onFileReceivedConsumer.accept(file);
+						}
+					});
 
 				} else {
 					logger.warn("Rejecting file");
