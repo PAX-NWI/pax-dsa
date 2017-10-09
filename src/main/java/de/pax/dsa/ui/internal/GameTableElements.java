@@ -3,7 +3,6 @@ package de.pax.dsa.ui.internal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
 import javafx.scene.Group;
 import javafx.scene.Node;

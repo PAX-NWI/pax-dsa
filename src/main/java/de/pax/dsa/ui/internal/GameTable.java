@@ -73,6 +73,13 @@ public class GameTable {
 			ImageNode img = new ImageNode(identifier, response.getImage(), x, y);
 			DragEnabler.enableDrag(img, session::sendMessage);
 			gameTableElements.add(img);
+			
+			ContextMenuProvider context = new ContextMenuProvider(img);
+			context.onDelete(node -> {
+				session.sendMessage(new ElementRemovedMessage(node.getId()));
+				gameTableElements.remove(node);
+			});
+			
 			session.sendMessage(
 					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, img.getWidth(), img.getHeight()));
 		});
@@ -93,8 +100,7 @@ public class GameTable {
 		
 		ContextMenuProvider context = new ContextMenuProvider(circle);
 		context.onDelete(node -> {
-			String id = node.getId();
-			session.sendMessage(new ElementRemovedMessage(id));
+			session.sendMessage(new ElementRemovedMessage(node.getId()));
 			gameTableElements.remove(node);
 		});
 
