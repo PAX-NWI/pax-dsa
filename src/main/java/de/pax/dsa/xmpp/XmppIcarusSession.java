@@ -77,7 +77,7 @@ public class XmppIcarusSession implements IIcarusSession {
 					onElementToTopConsumer.accept((ElementToTopMessage) decode);
 				} else if (decode instanceof ElementToBackMessage) {
 					onElementToBackConsumer.accept((ElementToBackMessage) decode);
-				}else {
+				} else {
 					logger.warn("Received non decodable message: " + message);
 				}
 			});
@@ -114,12 +114,12 @@ public class XmppIcarusSession implements IIcarusSession {
 	public void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer) {
 		this.onElementRemovedConsumer = onElementRemovedConsumer;
 	}
-	
+
 	@Override
 	public void onElementToTop(Consumer<ElementToTopMessage> onElementToTopConsumer) {
 		this.onElementToTopConsumer = onElementToTopConsumer;
 	}
-	
+
 	@Override
 	public void onElementToBack(Consumer<ElementToBackMessage> onElementToBackConsumer) {
 		this.onElementToBackConsumer = onElementToBackConsumer;
