@@ -25,6 +25,6 @@
       </HBox>
    </top>
    <center>
-      <Pane fx:id="mapPane" prefHeight="800.0" prefWidth="1000.0" BorderPane.alignment="CENTER" />
+      <Pane fx:id="mapPane" prefHeight="600.0" prefWidth="600.0" BorderPane.alignment="CENTER" />
    </center>
 </BorderPane>

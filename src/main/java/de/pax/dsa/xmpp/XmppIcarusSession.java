@@ -57,6 +57,7 @@ public class XmppIcarusSession implements IIcarusSession {
 			}
 
 			Platform.runLater(() -> {
+				logger.info("Received message:" + message.getBody());
 				Object decode = MessageConverter.decode(message, sender.toString());
 				if (decode instanceof PositionUpdatedMessage) {
 					positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
@@ -67,7 +68,6 @@ public class XmppIcarusSession implements IIcarusSession {
 				}  else if (decode instanceof ElementRemovedMessage) {
 					onElementRemovedConsumer.accept((ElementRemovedMessage) decode);
 				}
-				
 				else {
 					logger.warn("Received non decodable message: " + message);
 				}

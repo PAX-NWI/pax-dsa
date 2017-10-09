@@ -118,9 +118,7 @@ public class GameTable {
 	
 		session.onPositionUpdate(positionUpdate -> {
 			Node node = gameTableElements.getById(positionUpdate.getId());
-			logger.info("received " + positionUpdate);
-
-			new Move2DTransition(node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
+			new Move2DTransition((I2DObject) node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
 		});
 
 		session.onElementAdded(message -> {
