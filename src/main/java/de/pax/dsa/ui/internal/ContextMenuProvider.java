@@ -30,6 +30,8 @@ public class ContextMenuProvider {
 		onContextMenuNode.setOnMousePressed(event -> {
 			if (event.isSecondaryButtonDown()) {
 				contextMenu.show(node, event.getScreenX(), event.getScreenY());
+			} else {
+				contextMenu.hide();
 			}
 		});
 	}

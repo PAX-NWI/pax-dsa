@@ -1,10 +1,13 @@
 package de.pax.dsa.ui.internal;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.PostConstruct;
+import javax.imageio.ImageIO;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -26,9 +29,15 @@ import de.pax.dsa.ui.internal.nodes.GridFactory;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import de.pax.dsa.ui.internal.nodes.MoveableCircle;
 import de.pax.dsa.ui.internal.nodes.TwoStageMoveNode;
+import javafx.embed.swing.SwingFXUtils;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 
 /**
@@ -77,7 +86,6 @@ public class GameTable {
 
 			addContextMenu(img);
 
-
 			session.sendMessage(
 					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, img.getWidth(), img.getHeight()));
 		});
@@ -86,6 +94,56 @@ public class GameTable {
 		pane.setOnDragOver(dnd::mouseDragOver);
 
 		registerToSessionEvents();
+
+		ContextMenu contextMenu = new ContextMenu();
+		pane.setOnMousePressed(event -> {
+			if (event.isSecondaryButtonDown()) {
+				Image image = Clipboard.getSystemClipboard().getImage();
+				if (image != null) {
+					double screenX = event.getScreenX();
+					double screenY = event.getScreenY();
+					contextMenu.show(pane, screenX, screenY - 30);
+				}
+			} else {
+				contextMenu.hide();
+			}
+		});
+
+		MenuItem onTopItem = new MenuItem("Paste Image");
+		contextMenu.getItems().addAll(onTopItem);
+		onTopItem.setOnAction(event -> {
+			Image image = Clipboard.getSystemClipboard().getImage();
+			if (image == null) {
+				return;
+			}
+
+			String filename = "pasted-" + IdBuilder.getTimeStamp() + ".png";
+			File outputFile = new File("images/" + filename);
+			BufferedImage bImage = SwingFXUtils.fromFXImage(image, null);
+			try {
+				ImageIO.write(bImage, "png", outputFile);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+
+			String identifier = IdBuilder.build(filename, session.getUserName());
+			double x = contextMenu.getX();
+			double y = contextMenu.getY();
+
+			Point2D translated = pane.screenToLocal(x, y);
+
+			x = translated.getX();
+			y = translated.getY();
+
+			ImageNode img = new ImageNode(identifier, image, x, y);
+			DragEnabler.enableDrag(img, session::sendMessage);
+			gameTableElements.add(img);
+
+			addContextMenu(img);
+
+			session.sendMessage(
+					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, img.getWidth(), img.getHeight()));
+		});
 
 	}
 
@@ -164,11 +222,11 @@ public class GameTable {
 		session.onElementRemoved(elementRemovedMessage -> {
 			gameTableElements.remove(gameTableElements.getById(elementRemovedMessage.getId()));
 		});
-		
+
 		session.onElementToTop(elementToTopMessage -> {
 			gameTableElements.getById(elementToTopMessage.getId()).toFront();
 		});
-		
+
 		session.onElementToBack(elementToBackMessage -> {
 			gameTableElements.getById(elementToBackMessage.getId()).toBack();
 		});

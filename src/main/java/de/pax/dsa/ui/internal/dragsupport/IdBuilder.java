@@ -12,9 +12,12 @@ public class IdBuilder {
 	private static final String SEPARATOR = "-:-";
 
 	public static String build(String name, String owner) {
+		return name + SEPARATOR + owner + SEPARATOR + getTimeStamp();
+	}
+
+	public static String getTimeStamp() {
 		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		long time = timestamp.getTime();
-		return name + SEPARATOR + owner + SEPARATOR + Long.toString(time);
+		return Long.toString(timestamp.getTime());
 	}
 
 	public static String getName(String string) {
