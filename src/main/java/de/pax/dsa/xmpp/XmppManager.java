@@ -23,8 +23,10 @@ import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
 import org.jivesoftware.smackx.muc.MucEnterConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.muc.ParticipantStatusListener;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
+import org.jxmpp.jid.Jid;
 import org.jxmpp.jid.impl.JidCreate;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
@@ -98,6 +100,10 @@ public class XmppManager {
 		enterConfig.requestNoHistory();
 
 		multiUserChat.join(enterConfig.build());
+
+		multiUserChat.addParticipantListener(e -> {
+			logger.info("New User entered: " + e.getFrom().getResourceOrNull());
+		});
 
 		fileTransferManager = FileTransferManager.getInstanceFor(connection);
 
