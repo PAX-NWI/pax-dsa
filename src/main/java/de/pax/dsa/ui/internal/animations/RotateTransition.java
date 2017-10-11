@@ -16,7 +16,7 @@ public class RotateTransition extends Transition {
 		this.node = node;
 		currentAngle = node.getRotate();
 		rotationToBeDone = targetAngle - currentAngle;
-		setCycleDuration(Duration.millis(targetAngle * SPEED_FACTOR));
+		setCycleDuration(Duration.millis(Math.abs(rotationToBeDone) * SPEED_FACTOR));
 		setInterpolator(Interpolator.LINEAR);
 	}
 

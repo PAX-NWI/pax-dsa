@@ -14,6 +14,7 @@ import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
+import de.pax.dsa.ui.internal.animations.RotateTransition;
 import de.pax.dsa.ui.internal.contextmenus.NodeContextMenuBuilder;
 import de.pax.dsa.ui.internal.contextmenus.PaneContextMenuBuilder;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
@@ -166,7 +167,7 @@ public class GameTable {
 		});
 
 		session.onElementRotated(message -> {
-			gameTableElements.getById(message.getId()).setRotate(message.getAngle());
+			new RotateTransition(gameTableElements.getById(message.getId()), message.getAngle()).play();;
 		});
 
 		session.onRequestFile(message -> {
