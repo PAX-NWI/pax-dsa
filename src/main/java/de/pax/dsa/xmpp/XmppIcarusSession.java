@@ -14,6 +14,7 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
@@ -47,6 +48,8 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<ElementToBackMessage> onElementToBackConsumer;
 
+	private Consumer<ElementRotatedMessage> onElementRotatedConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
@@ -77,7 +80,11 @@ public class XmppIcarusSession implements IIcarusSession {
 					onElementToTopConsumer.accept((ElementToTopMessage) decode);
 				} else if (decode instanceof ElementToBackMessage) {
 					onElementToBackConsumer.accept((ElementToBackMessage) decode);
-				} else {
+				} else if (decode instanceof ElementRotatedMessage) {
+					onElementRotatedConsumer.accept((ElementRotatedMessage) decode);
+				} 
+				
+				else {
 					logger.warn("Received non decodable message: " + message);
 				}
 			});
@@ -124,6 +131,12 @@ public class XmppIcarusSession implements IIcarusSession {
 	public void onElementToBack(Consumer<ElementToBackMessage> onElementToBackConsumer) {
 		this.onElementToBackConsumer = onElementToBackConsumer;
 	}
+	
+	@Override
+	public void onElementRotated(Consumer<ElementRotatedMessage> onElementRotatedConsumer) {
+		this.onElementRotatedConsumer = onElementRotatedConsumer;
+	}
+
 
 	@Override
 	public void sendFile(String buddyJID, File file) {

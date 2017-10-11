@@ -1,4 +1,4 @@
-package de.pax.dsa.ui.internal;
+package de.pax.dsa.ui.internal.contextmenus;
 
 import java.util.function.Consumer;
 

@@ -6,7 +6,7 @@ import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.StrokeLineCap;
-
+@Deprecated
 public class TwoStageMoveNode extends Group implements I2DObject {
 
 	private AnchorCircle position;

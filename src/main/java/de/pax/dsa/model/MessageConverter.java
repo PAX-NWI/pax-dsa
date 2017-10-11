@@ -4,6 +4,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.PositionUpdatedMessage;
@@ -25,6 +26,8 @@ public class MessageConverter {
 			return new ElementToTopMessage(message, sender);
 		} else if (body.startsWith(ElementToBackMessage.startsWith())) {
 			return new ElementToBackMessage(message, sender);
+		} else if (body.startsWith(ElementRotatedMessage.startsWith())) {
+			return new ElementRotatedMessage(message, sender);
 		}
 		return null;
 	}

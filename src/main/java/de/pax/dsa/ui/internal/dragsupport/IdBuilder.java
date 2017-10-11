@@ -9,7 +9,7 @@ import java.sql.Timestamp;
  */
 public class IdBuilder {
 
-	private static final String SEPARATOR = "-:-";
+	private static final String SEPARATOR = " :: ";
 
 	public static String build(String name, String owner) {
 		return name + SEPARATOR + owner + SEPARATOR + getTimeStamp();

@@ -3,6 +3,11 @@ package de.pax.dsa.ui.internal;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
+
 import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -18,7 +23,8 @@ public class GameTableElements {
 
 	private Group group;
 
-	public GameTableElements(Pane pane) {
+	@PostConstruct
+	public void postConstruct(Pane pane) {
 		group = new Group();
 		pane.getChildren().add(group);
 	}
@@ -47,9 +53,10 @@ public class GameTableElements {
 	}
 
 	public List<Node> getByFilename(String filename) {
-		List<Node> collect = group.getChildren().stream().filter(e -> filename.equals(IdBuilder.getName(e.getId())))
+		return group.getChildren()//
+				.stream()//
+				.filter(e -> filename.equals(IdBuilder.getName(e.getId())))
 				.collect(Collectors.toList());
-		return collect;
 
 	}
 }
