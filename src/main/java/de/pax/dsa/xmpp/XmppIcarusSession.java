@@ -5,8 +5,10 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jxmpp.jid.parts.Resourcepart;
+import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,8 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<ElementRotatedMessage> onElementRotatedConsumer;
 
+	private Consumer<String> onUserEnteredConsumer;
+
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
@@ -91,6 +95,7 @@ public class XmppIcarusSession implements IIcarusSession {
 		});
 
 		xmppManager.onFileReceived(onFileReceivedConsumer);
+		xmppManager.onUserEntered(onUserEnteredConsumer);
 	}
 
 	@Override
@@ -153,6 +158,11 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
+	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
+		this.onUserEnteredConsumer = onUserEnteredConsumer;
+	}
+	
+	@Override
 	public void disconnect() {
 		if (xmppManager != null) {
 			xmppManager.disconnect();
@@ -167,6 +177,16 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public String getServer() {
 		return SERVER;
+	}
+
+	@Override
+	public void sendMessage(IMessage message, String name) {
+		try {
+			xmppManager.sendMessage(message.toString(), name);
+		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {
+			logger.error("Error sending provate message to "+name, e);
+		}
+		
 	}
 
 }

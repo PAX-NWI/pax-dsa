@@ -42,5 +42,9 @@ public interface IIcarusSession {
 
 	void onElementRotated(Consumer<ElementRotatedMessage> onElementRotatedConsumer);
 
+	void onUserEntered(Consumer<String> onUserEnteredConsumer);
+
+	void sendMessage(IMessage message, String name);
+
 }
  

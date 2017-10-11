@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
-import javax.inject.Inject;
-
-import org.slf4j.Logger;
 
 import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
 import javafx.scene.Group;
@@ -56,6 +53,14 @@ public class GameTableElements {
 		return group.getChildren()//
 				.stream()//
 				.filter(e -> filename.equals(IdBuilder.getName(e.getId())))
+				.collect(Collectors.toList());
+
+	}
+
+	public List<Node> getOwnedBy(String userName) {
+		return group.getChildren()//
+				.stream()//
+				.filter(e -> userName.equals(IdBuilder.getOwner(e.getId())))
 				.collect(Collectors.toList());
 
 	}

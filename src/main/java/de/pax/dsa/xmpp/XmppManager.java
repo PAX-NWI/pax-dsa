@@ -11,6 +11,8 @@ import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
+import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
+import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.Roster.SubscriptionMode;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -65,6 +67,8 @@ public class XmppManager {
 	private FileTransferManager fileTransferManager;
 
 	private Consumer<File> onFileReceivedConsumer;
+	
+	private Consumer<String> onUserEnteredConsumer;
 
 	public XmppManager(String server, String username, String password)
 			throws XMPPException, IOException, InterruptedException, SmackException {
@@ -100,6 +104,12 @@ public class XmppManager {
 		multiUserChat.join(enterConfig.build());
 
 		multiUserChat.addParticipantListener(e -> {
+			Platform.runLater(() -> {
+				if (onUserEnteredConsumer != null) {
+					onUserEnteredConsumer.accept(String.valueOf(e.getFrom().getResourceOrNull()));
+				}
+			});
+			
 			logger.info("New User entered: " + e.getFrom().getResourceOrNull());
 		});
 
@@ -146,6 +156,10 @@ public class XmppManager {
 		}
 
 	}
+	
+	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
+		this.onUserEnteredConsumer = onUserEnteredConsumer;
+	}
 
 	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
 		this.onFileReceivedConsumer = onFileReceivedConsumer;
@@ -167,12 +181,14 @@ public class XmppManager {
 
 	public void addMessageListener(MessageListener messageListener) {
 		multiUserChat.addMessageListener(messageListener);
+		chatManager.addIncomingListener(new IncomingChatMessageListener() {
+			@Override
+			public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
+				messageListener.processMessage(message);
+			}
+		});
 	}
 
-	/**
-	 * Use MultiUserChat instead
-	 */
-	@Deprecated
 	public void sendMessage(String message, String buddyJID)
 			throws XMPPException, XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
 		logger.debug("Sending mesage '{}' to user {}", message, buddyJID);

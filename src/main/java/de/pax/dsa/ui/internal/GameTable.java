@@ -12,6 +12,7 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.animations.RotateTransition;
@@ -28,6 +29,7 @@ import javafx.scene.Node;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 
 /**
  * Drag and drop:
@@ -84,8 +86,8 @@ public class GameTable {
 			DragEnabler.enableRotate(imageNode.getRotateAnchor(), imageNode, session::sendMessage);
 			gameTableElements.add(imageNode);
 			nodeContextMenuBuilder.buildContextMenuFor(imageNode);
-			session.sendMessage(
-					new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, imageNode.getWidth(), imageNode.getHeight()));
+			session.sendMessage(new ElementAddedMessage(identifier, ElementType.IMAGE, x, y, imageNode.getWidth(),
+					imageNode.getHeight()));
 		});
 
 		pane.setOnDragDropped(dnd::mouseDragDropped);
@@ -167,7 +169,7 @@ public class GameTable {
 		});
 
 		session.onElementRotated(message -> {
-			new RotateTransition(gameTableElements.getById(message.getId()), message.getAngle()).play();;
+			new RotateTransition(gameTableElements.getById(message.getId()), message.getAngle()).play();
 		});
 
 		session.onRequestFile(message -> {
@@ -181,6 +183,34 @@ public class GameTable {
 			List<Node> byFilename = gameTableElements.getByFilename(file.getName());
 			for (Node node : byFilename) {
 				((ImageNode) node).setImage(new Image(FILE + IMAGE_FOLDER + file.getName()));
+			}
+		});
+
+		session.onUserEntered(name -> {
+			List<Node> my = gameTableElements.getOwnedBy(session.getUserName());
+			for (Node node : my) {
+				if (node instanceof Circle) {
+					MoveableCircle circle = (MoveableCircle) node;
+					session.sendMessage(new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(),
+							circle.getY(), circle.getRadius(), circle.getRadius()), name);
+				} else if (node instanceof ImageNode) {
+					ImageNode imageNode = (ImageNode) node;
+					session.sendMessage(new ElementAddedMessage(imageNode.getId(), ElementType.IMAGE, imageNode.getX(),
+							imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()));
+				}
+
+				if (node.getRotate() != 0) {
+					try {
+						Thread.sleep(500);
+					} catch (InterruptedException e) {
+					}
+					session.sendMessage(new ElementRotatedMessage(node.getId(), (int) node.getRotate()));
+				}
+
+				try {
+					Thread.sleep(500);
+				} catch (InterruptedException e) {
+				}
 			}
 		});
 
