@@ -9,7 +9,7 @@ import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
-import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 
 public interface IIcarusSession {
@@ -18,7 +18,7 @@ public interface IIcarusSession {
 	
 	void disconnect();
 
-	void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer);
+	void onPositionUpdate(Consumer<ElementMovedMessage> positionUpdateConsumer);
 
 	void onElementAdded(Consumer<ElementAddedMessage> positionUpdateConsumer);
 

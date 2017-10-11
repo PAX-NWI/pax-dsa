@@ -7,17 +7,17 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
-import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.ElementMovedMessage;
 
 public class StringMapperTest {
 
 	@Test
 	public void testPositionUpdateTransform() throws XmppStringprepException {
 
-		PositionUpdatedMessage original = new PositionUpdatedMessage("id", 52, 42);
+		ElementMovedMessage original = new ElementMovedMessage("id", 52, 42);
 		
 		Message message = new Message("to", original.toString());
-		PositionUpdatedMessage parsed = new PositionUpdatedMessage(message,"sender");
+		ElementMovedMessage parsed = new ElementMovedMessage(message,"sender");
 
 		assertEquals(original.getId(), parsed.getId());
 		assertEquals(original.getX(), parsed.getX(), 0);

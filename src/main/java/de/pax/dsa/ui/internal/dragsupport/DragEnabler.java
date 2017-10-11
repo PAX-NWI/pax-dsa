@@ -3,7 +3,7 @@ package de.pax.dsa.ui.internal.dragsupport;
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.ElementRotatedMessage;
-import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
@@ -22,11 +22,11 @@ import javafx.scene.shape.Circle;
  */
 public class DragEnabler {
 
-	public static void enableDrag(Node node, Consumer<PositionUpdatedMessage> onDragComplete) {
+	public static void enableDrag(Node node, Consumer<ElementMovedMessage> onDragComplete) {
 		enableDrag(node, (I2DObject) node, onDragComplete);
 	}
 
-	private static void enableDrag(Node node, I2DObject i2dObject, Consumer<PositionUpdatedMessage> onDragComplete) {
+	private static void enableDrag(Node node, I2DObject i2dObject, Consumer<ElementMovedMessage> onDragComplete) {
 
 		final DragDelta dragDelta = new DragDelta();
 		node.setOnMousePressed(mouseEvent -> {
@@ -41,7 +41,7 @@ public class DragEnabler {
 			}
 			node.getScene().setCursor(Cursor.HAND);
 			if (onDragComplete != null) {
-				onDragComplete.accept(new PositionUpdatedMessage(node.getId(), i2dObject.getX(), i2dObject.getY()));
+				onDragComplete.accept(new ElementMovedMessage(node.getId(), i2dObject.getX(), i2dObject.getY()));
 			}
 		});
 		node.setOnMouseDragged(mouseEvent -> {

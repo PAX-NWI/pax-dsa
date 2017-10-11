@@ -18,7 +18,7 @@ import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
-import de.pax.dsa.model.messages.PositionUpdatedMessage;
+import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import javafx.application.Platform;
 
@@ -32,7 +32,7 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private XmppManager xmppManager;
 
-	private Consumer<PositionUpdatedMessage> positionUpdateConsumer;
+	private Consumer<ElementMovedMessage> positionUpdateConsumer;
 
 	private Consumer<ElementAddedMessage> onElementAddedConsumer;
 
@@ -68,8 +68,8 @@ public class XmppIcarusSession implements IIcarusSession {
 			Platform.runLater(() -> {
 				logger.info("Received message:" + message.getBody());
 				Object decode = MessageConverter.decode(message, sender.toString());
-				if (decode instanceof PositionUpdatedMessage) {
-					positionUpdateConsumer.accept((PositionUpdatedMessage) decode);
+				if (decode instanceof ElementMovedMessage) {
+					positionUpdateConsumer.accept((ElementMovedMessage) decode);
 				} else if (decode instanceof ElementAddedMessage) {
 					onElementAddedConsumer.accept((ElementAddedMessage) decode);
 				} else if (decode instanceof RequestFileMessage) {
@@ -103,7 +103,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void onPositionUpdate(Consumer<PositionUpdatedMessage> positionUpdateConsumer) {
+	public void onPositionUpdate(Consumer<ElementMovedMessage> positionUpdateConsumer) {
 		this.positionUpdateConsumer = positionUpdateConsumer;
 	}
 
