@@ -1,5 +1,7 @@
 package de.pax.dsa;
 
+import java.io.File;
+
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.xmpp.XmppIcarusSession;
@@ -19,12 +21,17 @@ public class MainApplication extends Application {
 
 	public void start(Stage stage) throws Exception {
 
+		File dir = new File("images");
+		if (!dir.exists()) {
+			dir.mkdir();
+		}
+
 		Context context = new Context();
-		
+
 		context.set(Stage.class, stage);
-		
+
 		session = context.create(XmppIcarusSession.class);
-		
+
 		context.set(IIcarusSession.class, session);
 
 		FXMLLoader fxmlLoader = new FXMLLoader();
@@ -35,7 +42,7 @@ public class MainApplication extends Application {
 		stage.setScene(scene);
 		stage.show();
 	}
-	
+
 	@Override
 	public void stop() throws Exception {
 		session.disconnect();
