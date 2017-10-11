@@ -41,7 +41,10 @@ public class ImageNode extends Group implements I2DObject {
 	}
 
 	public void setImage(Image image) {
+		this.image = image;
 		imageView.setImage(image);
+		setX(getX());
+		setY(getY());
 	}
 
 	public ImageView getImageView() {

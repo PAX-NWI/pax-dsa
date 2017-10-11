@@ -141,7 +141,7 @@ public class GameTable {
 					// TODO inline this waiting gif to the jar
 					// TODO display a rect with the size of the image to be
 					// received and place the waiting gif in the middle of it
-					imageNode = new ImageNode(id, FILE + IMAGE_FOLDER + "waiting.gif", message.getX(), message.getY());
+					imageNode = new ImageNode(id, "waiting.gif", message.getX(), message.getY());
 				} else {
 					imageNode = new ImageNode(id, FILE + IMAGE_FOLDER + name, message.getX(), message.getY());
 				}
