@@ -140,7 +140,6 @@ public class GameTable {
 				if (!new File(IMAGE_FOLDER + name).exists()) {
 					String owner = IdBuilder.getOwner(id);
 					session.sendMessage(new RequestFileMessage(owner, name));
-					// TODO inline this waiting gif to the jar
 					// TODO display a rect with the size of the image to be
 					// received and place the waiting gif in the middle of it
 					imageNode = new ImageNode(id, "waiting.gif", message.getX(), message.getY());
@@ -198,22 +197,24 @@ public class GameTable {
 					session.sendMessage(new ElementAddedMessage(imageNode.getId(), ElementType.IMAGE, imageNode.getX(),
 							imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()));
 				}
+				sleep(500);
 
-				if (node.getRotate() != 0) {
-					try {
-						Thread.sleep(500);
-					} catch (InterruptedException e) {
-					}
+				if ((int) node.getRotate() != 0) {
 					session.sendMessage(new ElementRotatedMessage(node.getId(), (int) node.getRotate()));
+					sleep(500);
 				}
 
-				try {
-					Thread.sleep(500);
-				} catch (InterruptedException e) {
-				}
 			}
 		});
 
+	}
+
+	private void sleep(int time) {
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
+			logger.error("Error performing thread sleep", e);
+		}
 	}
 
 	// public void doMoves() {

@@ -22,6 +22,7 @@ import org.jivesoftware.smackx.filetransfer.FileTransferManager;
 import org.jivesoftware.smackx.filetransfer.FileTransferRequest;
 import org.jivesoftware.smackx.filetransfer.IncomingFileTransfer;
 import org.jivesoftware.smackx.filetransfer.OutgoingFileTransfer;
+import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.MucEnterConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
@@ -67,7 +68,7 @@ public class XmppManager {
 	private FileTransferManager fileTransferManager;
 
 	private Consumer<File> onFileReceivedConsumer;
-	
+
 	private Consumer<String> onUserEnteredConsumer;
 
 	public XmppManager(String server, String username, String password)
@@ -103,14 +104,20 @@ public class XmppManager {
 
 		multiUserChat.join(enterConfig.build());
 
-		multiUserChat.addParticipantListener(e -> {
-			Platform.runLater(() -> {
+		multiUserChat.addParticipantStatusListener(new DefaultParticipantStatusListener() {
+
+			@Override
+			public void joined(EntityFullJid participant) {
 				if (onUserEnteredConsumer != null) {
-					onUserEnteredConsumer.accept(String.valueOf(e.getFrom().getResourceOrNull()));
+					logger.info("New User entered: " + participant.getLocalpart());
+					Platform.runLater(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getLocalpart())));
 				}
-			});
-			
-			logger.info("New User entered: " + e.getFrom().getResourceOrNull());
+			}
+
+			@Override
+			public void left(EntityFullJid participant) {
+				logger.info("User left: " + participant.getLocalpart());
+			}
 		});
 
 		fileTransferManager = FileTransferManager.getInstanceFor(connection);
@@ -130,11 +137,9 @@ public class XmppManager {
 						sleep(1000);
 					}
 
-					Platform.runLater(() -> {
-						if (onFileReceivedConsumer != null) {
-							onFileReceivedConsumer.accept(file);
-						}
-					});
+					if (onFileReceivedConsumer != null) {
+						Platform.runLater(() -> onFileReceivedConsumer.accept(file));
+					}
 
 				} else {
 					logger.warn("Rejecting file");
@@ -148,7 +153,7 @@ public class XmppManager {
 		chatManager = ChatManager.getInstanceFor(connection);
 	}
 
-	protected void sleep(int i) {
+	private void sleep(int i) {
 		try {
 			Thread.sleep(i);
 		} catch (InterruptedException e) {
@@ -156,7 +161,7 @@ public class XmppManager {
 		}
 
 	}
-	
+
 	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
 		this.onUserEnteredConsumer = onUserEnteredConsumer;
 	}
@@ -166,11 +171,8 @@ public class XmppManager {
 	}
 
 	protected boolean shouldAccept(FileTransferRequest request) {
-		String filename = request.getFileName();
-		if (filename.endsWith(".png") || filename.endsWith(".jpeg") || filename.endsWith(".jpg")) {
-			return true;
-		}
-		return false;
+		String filename = request.getFileName().toLowerCase();
+		return (filename.endsWith(".png") || filename.endsWith(".jpeg") || filename.endsWith(".jpg"));
 	}
 
 	public void disconnect() {

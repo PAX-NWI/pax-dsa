@@ -4,6 +4,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
+import javax.inject.Inject;
+
+import org.slf4j.Logger;
 
 import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
 import javafx.scene.Group;
@@ -19,6 +22,9 @@ import javafx.scene.layout.Pane;
 public class GameTableElements {
 
 	private Group group;
+
+	@Inject
+	private Logger logger;
 
 	@PostConstruct
 	public void postConstruct(Pane pane) {
@@ -38,12 +44,12 @@ public class GameTableElements {
 		List<Node> collect = group.getChildren().stream().filter(e -> id.equals(e.getId()))
 				.collect(Collectors.toList());
 		if (collect.size() != 1) {
-			System.err.println("searching: " + id);
+			logger.error("ID: " + id + "exists not exactly once (" + collect.size() + " times)");
 			group.getChildren().stream().forEach(node -> {
-				System.err.println("available: " + node.getId());
+				logger.error("available ids are: " + node.getId());
 
 			});
-			throw new IllegalStateException("ID: " + id + "exists not exactly once (" + collect.size() + " times)");
+			return null;
 		} else {
 			return collect.get(0);
 		}
@@ -52,16 +58,14 @@ public class GameTableElements {
 	public List<Node> getByFilename(String filename) {
 		return group.getChildren()//
 				.stream()//
-				.filter(e -> filename.equals(IdBuilder.getName(e.getId())))
+				.filter(e -> filename.equals(IdBuilder.getName(e.getId())))//
 				.collect(Collectors.toList());
-
 	}
 
 	public List<Node> getOwnedBy(String userName) {
 		return group.getChildren()//
 				.stream()//
-				.filter(e -> userName.equals(IdBuilder.getOwner(e.getId())))
+				.filter(e -> userName.equals(IdBuilder.getOwner(e.getId())))//
 				.collect(Collectors.toList());
-
 	}
 }
