@@ -109,14 +109,14 @@ public class XmppManager {
 			@Override
 			public void joined(EntityFullJid participant) {
 				if (onUserEnteredConsumer != null) {
-					logger.info("New User entered: " + participant.getLocalpart());
-					Platform.runLater(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getLocalpart())));
+					logger.info("New User entered: " + participant.getResourcepart());
+					Platform.runLater(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
 				}
 			}
 
 			@Override
 			public void left(EntityFullJid participant) {
-				logger.info("User left: " + participant.getLocalpart());
+				logger.info("User left: " + participant.getResourcepart());
 			}
 		});
 

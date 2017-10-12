@@ -122,7 +122,9 @@ public class GameTable {
 
 		session.onPositionUpdate(positionUpdate -> {
 			Node node = gameTableElements.getById(positionUpdate.getId());
-			new Move2DTransition((I2DObject) node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
+			if (node != null) {
+				new Move2DTransition((I2DObject) node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
+			}
 		});
 
 		session.onElementAdded(message -> {
@@ -190,17 +192,17 @@ public class GameTable {
 			for (Node node : my) {
 				if (node instanceof Circle) {
 					MoveableCircle circle = (MoveableCircle) node;
-					session.sendMessage(new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(),
+					session.sendMessageToUser(new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(),
 							circle.getY(), circle.getRadius(), circle.getRadius()), name);
 				} else if (node instanceof ImageNode) {
 					ImageNode imageNode = (ImageNode) node;
-					session.sendMessage(new ElementAddedMessage(imageNode.getId(), ElementType.IMAGE, imageNode.getX(),
-							imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()));
+					session.sendMessageToUser(new ElementAddedMessage(imageNode.getId(), ElementType.IMAGE,
+							imageNode.getX(), imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()), name);
 				}
 				sleep(500);
 
-				if ((int) node.getRotate() != 0) {
-					session.sendMessage(new ElementRotatedMessage(node.getId(), (int) node.getRotate()));
+				if (node.getRotate() != 0) {
+					session.sendMessageToUser(new ElementRotatedMessage(node.getId(), (int) node.getRotate()), name);
 					sleep(500);
 				}
 

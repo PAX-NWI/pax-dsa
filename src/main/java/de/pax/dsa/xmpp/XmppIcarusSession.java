@@ -180,7 +180,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void sendMessage(IMessage message, String name) {
+	public void sendMessageToUser(IMessage message, String name) {
 		try {
 			xmppManager.sendMessage(message.toString(), name);
 		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {

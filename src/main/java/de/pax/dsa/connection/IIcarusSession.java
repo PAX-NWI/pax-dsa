@@ -44,7 +44,7 @@ public interface IIcarusSession {
 
 	void onUserEntered(Consumer<String> onUserEnteredConsumer);
 
-	void sendMessage(IMessage message, String name);
+	void sendMessageToUser(IMessage message, String name);
 
 }
  

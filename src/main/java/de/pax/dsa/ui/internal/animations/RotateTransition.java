@@ -22,6 +22,10 @@ public class RotateTransition extends Transition {
 
 	@Override
 	protected void interpolate(double frac) {
+		
+		double d = currentAngle + rotationToBeDone;
+		System.out.println(d);
+		
 		node.setRotate(currentAngle + rotationToBeDone * frac);
 	}
 }
