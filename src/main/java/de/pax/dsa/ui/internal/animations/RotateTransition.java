@@ -16,16 +16,21 @@ public class RotateTransition extends Transition {
 		this.node = node;
 		currentAngle = node.getRotate();
 		rotationToBeDone = targetAngle - currentAngle;
+
+		//choose shortest path to turn to
+		if (rotationToBeDone > 180) {
+			rotationToBeDone -= 360;
+		}
+		if (rotationToBeDone < -180) {
+			rotationToBeDone += 360;
+		}
+
 		setCycleDuration(Duration.millis(Math.abs(rotationToBeDone) * SPEED_FACTOR));
 		setInterpolator(Interpolator.LINEAR);
 	}
 
 	@Override
 	protected void interpolate(double frac) {
-		
-		double d = currentAngle + rotationToBeDone;
-		System.out.println(d);
-		
 		node.setRotate(currentAngle + rotationToBeDone * frac);
 	}
 }
