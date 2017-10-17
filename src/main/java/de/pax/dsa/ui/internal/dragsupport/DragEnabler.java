@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.ui.internal.nodes.ImageNode;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.ImageCursor;
 import javafx.scene.Node;
@@ -107,8 +108,10 @@ public class DragEnabler {
 	 */
 	private static int computeRotateBetween(MouseEvent mouseEvent, ImageNode node) {
 
-		double a = mouseEvent.getSceneX() - node.getCenter().getX();
-		double b = mouseEvent.getSceneY() - node.getCenter().getY();
+		Point2D nodeCenterInScene = node.localToScene(node.getCenter().getX(), node.getCenter().getY());
+
+		double a = mouseEvent.getSceneX() - nodeCenterInScene.getX();
+		double b = mouseEvent.getSceneY() - nodeCenterInScene.getY();
 
 		double atan2 = Math.atan2(a, b);
 

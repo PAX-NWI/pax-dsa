@@ -10,6 +10,7 @@ import javafx.scene.shape.Circle;
 
 public class ImageNode extends Group implements I2DObject {
 
+	private static final int ROTATION_ANCHOR_OFFSET = 10;
 	private ImageView imageView;
 	private Image image;
 	private Circle rotateAnchor;
@@ -24,20 +25,20 @@ public class ImageNode extends Group implements I2DObject {
 		imageView = new ImageView(image);
 
 		rotateAnchor = new Circle(5, Color.ORANGE);
-		
+
 		setId(id);
 		setX(x);
 		setY(y);
 
 		getChildren().addAll(imageView, rotateAnchor);
 	}
-	
+
 	public Circle getRotateAnchor() {
 		return rotateAnchor;
 	}
 
 	public Point2D getCenter() {
-		return new Point2D(getX() + getWidth() / 2, getY() + getHeight() / 2);
+		return new Point2D(getX() + getWidth() / 2, getY() + ROTATION_ANCHOR_OFFSET + getHeight() / 2);
 	}
 
 	public void setImage(Image image) {
@@ -78,7 +79,7 @@ public class ImageNode extends Group implements I2DObject {
 	@Override
 	public void setY(double y) {
 		imageView.setY(y);
-		rotateAnchor.setCenterY(y-10);
+		rotateAnchor.setCenterY(y - ROTATION_ANCHOR_OFFSET);
 	}
 
 	public void setIsRotating(boolean isRotating) {
@@ -88,5 +89,5 @@ public class ImageNode extends Group implements I2DObject {
 	public boolean isRotating() {
 		return isRotating;
 	}
-	
+
 }
