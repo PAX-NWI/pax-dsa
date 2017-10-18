@@ -61,11 +61,12 @@ public class XmppIcarusSession implements IIcarusSession {
 			uiSynchronize.run(() -> {
 				logger.info("Received message:" + message.getBody());
 				Object decode = MessageConverter.decode(message, sender.toString());
-				Consumer consumer = messageConsumerList.get(decode.getClass());
+				Class<? extends Object> class1 = decode.getClass();
+				Consumer consumer = messageConsumerList.get(class1);
 				if (consumer != null) {
 					consumer.accept(decode);
 				} else {
-					logger.warn("No Consumer registered for {}", decode.getClass());
+					logger.warn("No Consumer registered for {}", class1);
 				}
 
 			});
@@ -86,7 +87,6 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public <T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer) {
-		Map<Class<T>, Consumer<T>> messageConsumerList = new HashMap<>();
 		if (messageConsumerList.containsKey(messageClass)) {
 			logger.warn("Consumer for class {} already registered and will be overwritten!", messageClass);
 		}
