@@ -1,7 +1,6 @@
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.IOException;
 
 import org.jivesoftware.smack.SmackException;
@@ -12,7 +11,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.jxmpp.stringprep.XmppStringprepException;
 
+import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.xmpp.XmppManager;
+import mocks.MockUiSync;
 
 /**
  * Created by swinter on 11.04.2017.
@@ -47,8 +48,8 @@ public class XmppManagerTest {
 		if (StringUtils.isNullOrEmpty(user2_password))
 			fail("user2_password is empty");
 
-		user1_manager = new XmppManager(SERVER, user1_username, user1_password);
-		user2_manager = new XmppManager(SERVER, user2_username, user2_password);
+		user1_manager = new XmppManager(SERVER, user1_username, user1_password, new MockUiSync());
+		user2_manager = new XmppManager(SERVER, user2_username, user2_password, new MockUiSync());
 	}
 
 	@Test
@@ -65,11 +66,11 @@ public class XmppManagerTest {
 		Thread.sleep(5000);
 
 		assertEquals(TEST_MESSAGE, receivedMessage);
-//			
-//		File file = new File("src/main/resources/KibaMap.png");
-//		user1_manager.sendFile("pax2", file);
-//		
-//		Thread.sleep(5000);
+		//
+		// File file = new File("src/main/resources/KibaMap.png");
+		// user1_manager.sendFile("pax2", file);
+		//
+		// Thread.sleep(5000);
 	}
 
 	@After

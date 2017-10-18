@@ -2,13 +2,18 @@ package de.pax.dsa.xmpp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
+import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
@@ -26,6 +31,7 @@ import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.MucEnterConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
+import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.impl.JidCreate;
@@ -34,7 +40,7 @@ import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javafx.application.Platform;
+import de.pax.dsa.di.IUiSynchronize;
 
 /**
  * Smack Documentation:
@@ -71,7 +77,7 @@ public class XmppManager {
 
 	private Consumer<String> onUserEnteredConsumer;
 
-	public XmppManager(String server, String username, String password)
+	public XmppManager(String server, String username, String password, IUiSynchronize uiSynchronize)
 			throws XMPPException, IOException, InterruptedException, SmackException {
 		this.server = server;
 		logger.debug("Initializing connection to server {}", server);
@@ -110,7 +116,8 @@ public class XmppManager {
 			public void joined(EntityFullJid participant) {
 				if (onUserEnteredConsumer != null) {
 					logger.info("New User entered: " + participant.getResourcepart());
-					Platform.runLater(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
+					uiSynchronize.run(
+							() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
 				}
 			}
 
@@ -138,7 +145,7 @@ public class XmppManager {
 					}
 
 					if (onFileReceivedConsumer != null) {
-						Platform.runLater(() -> onFileReceivedConsumer.accept(file));
+						uiSynchronize.run(() -> onFileReceivedConsumer.accept(file));
 					}
 
 				} else {
@@ -160,6 +167,19 @@ public class XmppManager {
 			e.printStackTrace();
 		}
 
+	}
+
+	public List<String> getAllOtherUsers() {
+		try {
+			List<Occupant> participants = multiUserChat.getParticipants();
+			return participants.stream()//
+					.filter(p -> !p.getNick().equals(multiUserChat.getNickname()))//
+					.map(p -> String.valueOf(p.getNick()))//
+					.collect(Collectors.toList());
+		} catch (NoResponseException | XMPPErrorException | NotConnectedException | InterruptedException e) {
+			logger.error("Could not get all user from chat", e);
+			return new ArrayList<>();
+		}
 	}
 
 	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {

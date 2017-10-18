@@ -4,6 +4,8 @@ import java.io.File;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
+import de.pax.dsa.di.IUiSynchronize;
+import de.pax.dsa.di.JavaFxUiSynchronize;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -28,6 +30,8 @@ public class MainApplication extends Application {
 
 		Context context = new Context();
 
+		context.set(IUiSynchronize.class, new JavaFxUiSynchronize());
+		
 		context.set(Stage.class, stage);
 
 		session = context.create(XmppIcarusSession.class);

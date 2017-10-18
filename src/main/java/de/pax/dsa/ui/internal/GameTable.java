@@ -12,7 +12,11 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
+import de.pax.dsa.model.messages.ElementMovedMessage;
+import de.pax.dsa.model.messages.ElementRemovedMessage;
 import de.pax.dsa.model.messages.ElementRotatedMessage;
+import de.pax.dsa.model.messages.ElementToBackMessage;
+import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.animations.RotateTransition;
@@ -120,14 +124,14 @@ public class GameTable {
 		//
 		// elementGroup = new Group(img, nodeA, nodeB);
 
-		session.onPositionUpdate(positionUpdate -> {
-			Node node = gameTableElements.getById(positionUpdate.getId());
+		session.onMessageReceived(ElementMovedMessage.class, message -> {
+			Node node = gameTableElements.getById(message.getId());
 			if (node != null) {
-				new Move2DTransition((I2DObject) node, positionUpdate.getX(), positionUpdate.getY(), 2).play();
+				new Move2DTransition((I2DObject) node, message.getX(), message.getY(), 2).play();
 			}
 		});
 
-		session.onElementAdded(message -> {
+		session.onMessageReceived(ElementAddedMessage.class, message -> {
 			ElementType elementType = message.getElementType();
 			if (elementType == ElementType.CIRCLE) {
 				MoveableCircle newCircle = new MoveableCircle(message.getId(), message.getX(), message.getY(),
@@ -157,23 +161,23 @@ public class GameTable {
 			}
 		});
 
-		session.onElementRemoved(message -> {
+		session.onMessageReceived(ElementRemovedMessage.class, message -> {
 			gameTableElements.remove(gameTableElements.getById(message.getId()));
 		});
 
-		session.onElementToTop(message -> {
+		session.onMessageReceived(ElementToTopMessage.class, message -> {
 			gameTableElements.getById(message.getId()).toFront();
 		});
 
-		session.onElementToBack(message -> {
+		session.onMessageReceived(ElementToBackMessage.class, message -> {
 			gameTableElements.getById(message.getId()).toBack();
 		});
 
-		session.onElementRotated(message -> {
+		session.onMessageReceived(ElementRotatedMessage.class, message -> {
 			new RotateTransition(gameTableElements.getById(message.getId()), message.getAngle()).play();
 		});
 
-		session.onRequestFile(message -> {
+		session.onMessageReceived(RequestFileMessage.class, message -> {
 			// if the owner of the file is me i have to send it
 			if (message.getOwner().equals(session.getUserName())) {
 				session.sendFile(message.getSender(), new File(IMAGE_FOLDER + message.getFileName()));

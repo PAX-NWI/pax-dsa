@@ -2,7 +2,11 @@ package de.pax.dsa.xmpp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Consumer;
+
+import javax.inject.Inject;
 
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
@@ -13,16 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
+import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.model.MessageConverter;
-import de.pax.dsa.model.messages.ElementAddedMessage;
-import de.pax.dsa.model.messages.ElementRemovedMessage;
-import de.pax.dsa.model.messages.ElementRotatedMessage;
-import de.pax.dsa.model.messages.ElementToBackMessage;
-import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessage;
-import de.pax.dsa.model.messages.ElementMovedMessage;
-import de.pax.dsa.model.messages.RequestFileMessage;
-import javafx.application.Platform;
 
 /**
  * Created by swinter on 22.04.2017.
@@ -34,63 +31,43 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private XmppManager xmppManager;
 
-	private Consumer<ElementMovedMessage> positionUpdateConsumer;
-
-	private Consumer<ElementAddedMessage> onElementAddedConsumer;
-
 	private String user;
-
-	private Consumer<RequestFileMessage> onRequestFileConsumer;
 
 	private Consumer<File> onFileReceivedConsumer;
 
-	private Consumer<ElementRemovedMessage> onElementRemovedConsumer;
-
-	private Consumer<ElementToTopMessage> onElementToTopConsumer;
-
-	private Consumer<ElementToBackMessage> onElementToBackConsumer;
-
-	private Consumer<ElementRotatedMessage> onElementRotatedConsumer;
+	Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
 
 	private Consumer<String> onUserEnteredConsumer;
+	
+	@Inject
+	private IUiSynchronize uiSynchronize;
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void connect(String user, String password) {
 		this.user = user;
 		try {
-			xmppManager = new XmppManager(SERVER, user, password);
+			xmppManager = new XmppManager(SERVER, user, password, uiSynchronize);
 		} catch (XMPPException | IOException | InterruptedException | SmackException e) {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
 		xmppManager.addMessageListener(message -> {
-			Resourcepart sender = message.getFrom().getResourceOrEmpty();
-			if (sender.equals(user)) {
+			Resourcepart sender = message.getFrom().getResourceOrThrow();
+			if (sender.toString().equals(user)) {
 				// do not listen to own messages
 				return;
 			}
 
-			Platform.runLater(() -> {
+			uiSynchronize.run(() -> {
 				logger.info("Received message:" + message.getBody());
 				Object decode = MessageConverter.decode(message, sender.toString());
-				if (decode instanceof ElementMovedMessage) {
-					positionUpdateConsumer.accept((ElementMovedMessage) decode);
-				} else if (decode instanceof ElementAddedMessage) {
-					onElementAddedConsumer.accept((ElementAddedMessage) decode);
-				} else if (decode instanceof RequestFileMessage) {
-					onRequestFileConsumer.accept((RequestFileMessage) decode);
-				} else if (decode instanceof ElementRemovedMessage) {
-					onElementRemovedConsumer.accept((ElementRemovedMessage) decode);
-				} else if (decode instanceof ElementToTopMessage) {
-					onElementToTopConsumer.accept((ElementToTopMessage) decode);
-				} else if (decode instanceof ElementToBackMessage) {
-					onElementToBackConsumer.accept((ElementToBackMessage) decode);
-				} else if (decode instanceof ElementRotatedMessage) {
-					onElementRotatedConsumer.accept((ElementRotatedMessage) decode);
-				} 
-				
-				else {
-					logger.warn("Received non decodable message: " + message);
+				Consumer consumer = messageConsumerList.get(decode.getClass());
+				if (consumer != null) {
+					consumer.accept(decode);
+				} else {
+					logger.warn("No Consumer registered for {}", decode.getClass());
 				}
+
 			});
 		});
 
@@ -108,40 +85,13 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void onPositionUpdate(Consumer<ElementMovedMessage> positionUpdateConsumer) {
-		this.positionUpdateConsumer = positionUpdateConsumer;
+	public <T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer) {
+		Map<Class<T>, Consumer<T>> messageConsumerList = new HashMap<>();
+		if (messageConsumerList.containsKey(messageClass)) {
+			logger.warn("Consumer for class {} already registered and will be overwritten!", messageClass);
+		}
+		messageConsumerList.put(messageClass, consumer);
 	}
-
-	@Override
-	public void onElementAdded(Consumer<ElementAddedMessage> onElementAddedConsumer) {
-		this.onElementAddedConsumer = onElementAddedConsumer;
-	}
-
-	@Override
-	public void onRequestFile(Consumer<RequestFileMessage> onRequestFileConsumer) {
-		this.onRequestFileConsumer = onRequestFileConsumer;
-	}
-
-	@Override
-	public void onElementRemoved(Consumer<ElementRemovedMessage> onElementRemovedConsumer) {
-		this.onElementRemovedConsumer = onElementRemovedConsumer;
-	}
-
-	@Override
-	public void onElementToTop(Consumer<ElementToTopMessage> onElementToTopConsumer) {
-		this.onElementToTopConsumer = onElementToTopConsumer;
-	}
-
-	@Override
-	public void onElementToBack(Consumer<ElementToBackMessage> onElementToBackConsumer) {
-		this.onElementToBackConsumer = onElementToBackConsumer;
-	}
-	
-	@Override
-	public void onElementRotated(Consumer<ElementRotatedMessage> onElementRotatedConsumer) {
-		this.onElementRotatedConsumer = onElementRotatedConsumer;
-	}
-
 
 	@Override
 	public void sendFile(String buddyJID, File file) {
@@ -161,7 +111,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
 		this.onUserEnteredConsumer = onUserEnteredConsumer;
 	}
-	
+
 	@Override
 	public void disconnect() {
 		if (xmppManager != null) {
@@ -184,9 +134,9 @@ public class XmppIcarusSession implements IIcarusSession {
 		try {
 			xmppManager.sendMessage(message.toString(), name);
 		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {
-			logger.error("Error sending provate message to "+name, e);
+			logger.error("Error sending provate message to " + name, e);
 		}
-		
+
 	}
 
 }
