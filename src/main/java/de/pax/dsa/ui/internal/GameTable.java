@@ -79,6 +79,7 @@ public class GameTable {
 		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
 		pane.getChildren().add(grid);
+		grid.toBack();
 
 		ImageDnDController dnd = new ImageDnDController(response -> {
 			String identifier = IdBuilder.build(response.getName(), session.getUserName());
