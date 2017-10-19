@@ -33,7 +33,7 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private Consumer<File> onFileReceivedConsumer;
 
-	Map<Class<?>, Consumer<?>> messageConsumerList;
+	Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
 
 	private Consumer<String> onUserEnteredConsumer;
 
@@ -45,7 +45,7 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void connect(String user, String password) {
-		messageConsumerList = new HashMap<>();
+		
 		this.user = user;
 		try {
 			xmppManager = new XmppManager(SERVER, user, password, uiSynchronize);
