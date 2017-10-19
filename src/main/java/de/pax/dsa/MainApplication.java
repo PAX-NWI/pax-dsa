@@ -5,9 +5,9 @@ import java.io.File;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.di.IUiSynchronize;
-import de.pax.dsa.di.JavaFxUiSynchronize;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
@@ -30,7 +30,7 @@ public class MainApplication extends Application {
 
 		Context context = new Context();
 
-		context.set(IUiSynchronize.class, new JavaFxUiSynchronize());
+		context.set(IUiSynchronize.class, Platform::runLater);
 		
 		context.set(Stage.class, stage);
 
@@ -50,6 +50,5 @@ public class MainApplication extends Application {
 	@Override
 	public void stop() throws Exception {
 		session.disconnect();
-		super.stop();
 	}
 }

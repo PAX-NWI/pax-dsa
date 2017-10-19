@@ -31,7 +31,7 @@ public class Context {
 		hashMap.put(Context.class, this);
 	}
 
-	public void set(Class<?> clazz, Object object) {
+	public <T> void set(Class<T> clazz, T object) {
 		if (hashMap.containsKey(clazz)) {
 			logger.warn("Class {} already exists, it's overwritten now.");
 		}
@@ -67,8 +67,10 @@ public class Context {
 			if (field.isAnnotationPresent(Inject.class)) {
 				field.setAccessible(true);
 
-				// provide new slf4j logger on inject
-				if (field.getType() == org.slf4j.Logger.class) {
+				// provide new slf4j logger on inject if no logger present
+				// logger can be set manually in unit tests to check log
+				// responses
+				if (field.getType() == Logger.class && !hashMap.containsKey(Logger.class)) {
 					Logger logger = LoggerFactory.getLogger(objectToWire.getClass());
 					field.set(objectToWire, logger);
 					continue;

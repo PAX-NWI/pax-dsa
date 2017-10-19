@@ -11,10 +11,10 @@ import javax.inject.Inject;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.parts.Resourcepart;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.IUiSynchronize;
@@ -27,53 +27,55 @@ import de.pax.dsa.model.messages.IMessage;
 public class XmppIcarusSession implements IIcarusSession {
 	private static final String SERVER = "jabber.de";
 
-	private Logger logger = LoggerFactory.getLogger(XmppIcarusSession.class);
-
 	private XmppManager xmppManager;
 
 	private String user;
 
 	private Consumer<File> onFileReceivedConsumer;
 
-	Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
+	Map<Class<?>, Consumer<?>> messageConsumerList;
 
 	private Consumer<String> onUserEnteredConsumer;
-	
+
+	@Inject
+	private Logger logger;
+
 	@Inject
 	private IUiSynchronize uiSynchronize;
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void connect(String user, String password) {
+		messageConsumerList = new HashMap<>();
 		this.user = user;
 		try {
 			xmppManager = new XmppManager(SERVER, user, password, uiSynchronize);
 		} catch (XMPPException | IOException | InterruptedException | SmackException e) {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
-		xmppManager.addMessageListener(message -> {
-			Resourcepart sender = message.getFrom().getResourceOrThrow();
-			if (sender.toString().equals(user)) {
-				// do not listen to own messages
-				return;
-			}
-
-			uiSynchronize.run(() -> {
-				logger.info("Received message:" + message.getBody());
-				Object decode = MessageConverter.decode(message, sender.toString());
-				Class<? extends Object> class1 = decode.getClass();
-				Consumer consumer = messageConsumerList.get(class1);
-				if (consumer != null) {
-					consumer.accept(decode);
-				} else {
-					logger.warn("No Consumer registered for {}", class1);
-				}
-
-			});
-		});
+		xmppManager.addMessageListener(this::processMessage);
 
 		xmppManager.onFileReceived(onFileReceivedConsumer);
 		xmppManager.onUserEntered(onUserEnteredConsumer);
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void processMessage(Message message) {
+		Resourcepart sender = message.getFrom().getResourceOrThrow();
+		if (sender.toString().equals(user)) {
+			// do not listen to own messages
+			return;
+		}
+		uiSynchronize.run(() -> {
+			logger.info("Received message:" + message.getBody());
+			Object decode = MessageConverter.decode(message, sender.toString());
+			Class<? extends Object> class1 = decode.getClass();
+			Consumer consumer = messageConsumerList.get(class1);
+			if (consumer != null) {
+				consumer.accept(decode);
+			} else {
+				logger.warn("No Consumer registered for {}", class1);
+			}
+		});
 	}
 
 	@Override
@@ -136,7 +138,6 @@ public class XmppIcarusSession implements IIcarusSession {
 		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {
 			logger.error("Error sending provate message to " + name, e);
 		}
-
 	}
 
 }

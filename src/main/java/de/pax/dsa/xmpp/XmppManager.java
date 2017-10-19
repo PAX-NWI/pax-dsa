@@ -16,8 +16,6 @@ import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
-import org.jivesoftware.smack.chat2.IncomingChatMessageListener;
-import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smack.roster.Roster;
 import org.jivesoftware.smack.roster.Roster.SubscriptionMode;
 import org.jivesoftware.smack.tcp.XMPPTCPConnection;
@@ -203,12 +201,7 @@ public class XmppManager {
 
 	public void addMessageListener(MessageListener messageListener) {
 		multiUserChat.addMessageListener(messageListener);
-		chatManager.addIncomingListener(new IncomingChatMessageListener() {
-			@Override
-			public void newIncomingMessage(EntityBareJid from, Message message, Chat chat) {
-				messageListener.processMessage(message);
-			}
-		});
+		chatManager.addIncomingListener((from, message, chat) -> messageListener.processMessage(message));
 	}
 
 	public void sendMessage(String message, String buddyJID)

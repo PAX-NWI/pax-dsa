@@ -11,14 +11,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.jxmpp.stringprep.XmppStringprepException;
 
-import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.xmpp.XmppManager;
 import mocks.MockUiSync;
 
 /**
  * Created by swinter on 11.04.2017.
  */
-public class XmppManagerTest {
+public class OnlineXmppManagerTest {
 
 	// realistic test message to check correct processing of special characters
 	private static final String TEST_MESSAGE = "PositionUpdate [id=" + "C:/possible/path\\chars" + ", x=" + 10.3
