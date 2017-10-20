@@ -19,7 +19,7 @@ import org.slf4j.Logger;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.model.MessageConverter;
-import de.pax.dsa.model.messages.IMessage;
+import de.pax.dsa.model.messages.IMessageObject;
 
 /**
  * Created by swinter on 22.04.2017.
@@ -79,7 +79,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void sendMessage(IMessage message) {
+	public void sendMessage(IMessageObject message) {
 		if (xmppManager != null) {
 			xmppManager.sendMessage(message.toString());
 		} else {
@@ -132,7 +132,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public void sendMessageToUser(IMessage message, String name) {
+	public void sendMessageToUser(IMessageObject message, String name) {
 		try {
 			xmppManager.sendMessage(message.toString(), name);
 		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {

@@ -3,7 +3,7 @@ package de.pax.dsa.connection;
 import java.io.File;
 import java.util.function.Consumer;
 
-import de.pax.dsa.model.messages.IMessage;
+import de.pax.dsa.model.messages.IMessageObject;
 
 public interface IIcarusSession {
 
@@ -19,11 +19,11 @@ public interface IIcarusSession {
 
 	void sendFile(String buddyJID, File file);
 
-	void sendMessage(IMessage message);
+	void sendMessage(IMessageObject message);
 
 	void onUserEntered(Consumer<String> onUserEnteredConsumer);
 
-	void sendMessageToUser(IMessage message, String name);
+	void sendMessageToUser(IMessageObject message, String name);
 
 	<T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer);
 

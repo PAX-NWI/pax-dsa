@@ -1,8 +1,6 @@
 import static org.junit.Assert.assertEquals;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
 
 import org.jivesoftware.smack.packet.Message;
 import org.junit.Before;
@@ -33,10 +31,6 @@ public class OfflineXmppIcarusSessionTest {
 		logger = new TestLogger();
 		context.set(Logger.class, logger);
 		session = context.create(XmppIcarusSession.class);
-
-		Field declaredField = session.getClass().getDeclaredField("messageConsumerList");
-		declaredField.setAccessible(true);
-		declaredField.set(session, new HashMap<>());
 	}
 
 	@Test

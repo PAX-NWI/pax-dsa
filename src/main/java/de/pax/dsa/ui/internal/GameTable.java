@@ -62,10 +62,6 @@ public class GameTable {
 	@Inject
 	private Context context;
 
-	// private TwoStageMoveNode nodeA;
-	//
-	// private TwoStageMoveNode nodeB;
-
 	private GameTableElements gameTableElements;
 	private NodeContextMenuBuilder nodeContextMenuBuilder;
 
@@ -114,16 +110,6 @@ public class GameTable {
 	}
 
 	private void registerToSessionEvents() {
-
-		// nodeA = new TwoStageMoveNode("nodeA", 100, 100);
-		// nodeA.setMoveTarget(100, 300);
-		// nodeB = new TwoStageMoveNode("nodeB", 200, 100);
-		// nodeB.setMoveTarget(200, 500);
-		//
-		// DragEnabler.enableDrag(nodeA, sendPositionUpdate);
-		// DragEnabler.enableDrag(nodeB, sendPositionUpdate);
-		//
-		// elementGroup = new Group(img, nodeA, nodeB);
 
 		session.onMessageReceived(ElementMovedMessage.class, message -> {
 			Node node = gameTableElements.getById(message.getId());

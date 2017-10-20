@@ -7,7 +7,7 @@ import org.jivesoftware.smack.packet.Message;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.StringMapper;
 
-public class ElementAddedMessage implements IMessage {
+public class ElementAddedMessage implements IMessageObject {
 
 	private ElementType elementType;
 	private double x;

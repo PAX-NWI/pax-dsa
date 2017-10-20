@@ -6,7 +6,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.StringMapper;
 
-public class ElementToBackMessage implements IMessage {
+public class ElementToBackMessage implements IMessageObject {
 
 	private String id;
 	private String sender;

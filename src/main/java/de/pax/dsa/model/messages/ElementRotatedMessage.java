@@ -6,7 +6,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.StringMapper;
 
-public class ElementRotatedMessage implements IMessage {
+public class ElementRotatedMessage implements IMessageObject {
 
 	private String id;
 	private String sender;

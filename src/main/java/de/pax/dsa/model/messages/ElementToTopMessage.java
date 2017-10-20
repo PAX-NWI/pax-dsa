@@ -6,7 +6,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.StringMapper;
 
-public class ElementToTopMessage implements IMessage {
+public class ElementToTopMessage implements IMessageObject {
 
 	private String id;
 	private String sender;

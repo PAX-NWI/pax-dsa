@@ -7,13 +7,13 @@ import de.pax.dsa.model.messages.ElementRemovedMessage;
 import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
-import de.pax.dsa.model.messages.IMessage;
+import de.pax.dsa.model.messages.IMessageObject;
 import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
 
 public class MessageConverter {
 
-	public static IMessage decode(Message message, String sender) {
+	public static IMessageObject decode(Message message, String sender) {
 		String body = message.getBody();
 		if (body.startsWith(ElementMovedMessage.startsWith())) {
 			return new ElementMovedMessage(message, sender);

@@ -1,6 +1,6 @@
 package de.pax.dsa.model.messages;
 
-public interface IMessage {
+public interface IMessageObject {
 
 	String getSender();
 

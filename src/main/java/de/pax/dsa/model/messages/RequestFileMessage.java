@@ -6,7 +6,7 @@ import org.jivesoftware.smack.packet.Message;
 
 import de.pax.dsa.model.StringMapper;
 
-public class RequestFileMessage implements IMessage {
+public class RequestFileMessage implements IMessageObject {
 
 	private String owner;
 	private String fileName;
