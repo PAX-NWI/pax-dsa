@@ -135,21 +135,21 @@ public class GameTable {
 					// only one that can send it
 					String owner = IdBuilder.getOwner(id);
 					// old way: ask all
-					// session.sendMessage(new RequestFileMessage(owner, name));
+					 session.sendMessage(new RequestFileMessage(owner, name));
 
 					// new way: ask user directly, make sure he exists
-					boolean fileRequestSent = session.sendMessageToUser(new RequestFileMessage(owner, name), owner);
-
-					if (!fileRequestSent) {
-						List<String> allOtherUsers = session.getAllOtherUsers();
-						Collections.shuffle(allOtherUsers);
-						for (String user : allOtherUsers) {
-							sleep(500);
-							if (session.sendMessageToUser(new RequestFileMessage(user, name), user)) {
-								break;
-							}
-						}
-					}
+//					boolean fileRequestSent = session.sendMessageToUser(new RequestFileMessage(owner, name), owner);
+//
+//					if (!fileRequestSent) {
+//						List<String> allOtherUsers = session.getAllOtherUsers();
+//						Collections.shuffle(allOtherUsers);
+//						for (String user : allOtherUsers) {
+//							sleep(500);
+//							if (session.sendMessageToUser(new RequestFileMessage(user, name), user)) {
+//								break;
+//							}
+//						}
+//					}
 
 					// TODO display a rect with the size of the image to be
 					// received and place the waiting gif in the middle of it
