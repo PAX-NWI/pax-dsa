@@ -3,17 +3,16 @@ package de.pax.dsa.xmpp;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.inject.Inject;
 
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.packet.Message;
 import org.jxmpp.jid.parts.Resourcepart;
-import org.jxmpp.stringprep.XmppStringprepException;
 import org.slf4j.Logger;
 
 import de.pax.dsa.connection.IIcarusSession;
@@ -45,7 +44,7 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	@Override
 	public void connect(String user, String password) {
-		
+
 		this.user = user;
 		try {
 			xmppManager = new XmppManager(SERVER, user, password, uiSynchronize);
@@ -62,7 +61,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	private void processMessage(Message message) {
 		Resourcepart sender = message.getFrom().getResourceOrThrow();
 		if (sender.toString().equals(user)) {
-			// do not listen to own messages
+			logger.debug("Ignoring message sent by myself: "+message.getBody());
 			return;
 		}
 		uiSynchronize.run(() -> {
@@ -88,6 +87,21 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
+	public boolean sendMessageToUser(IMessageObject message, String name) {
+		if (xmppManager != null) {
+			return xmppManager.sendMessage(message.toString(), name);
+		} else {
+			logger.warn("Not connected, can't send private message {} to {}", message.toString(), name);
+			return true;
+			// Returning false here would potentially cause the client to send
+			// messages to other users instead because he thinks that only this
+			// user is not online.
+			// But since we now here that we are not connected and throw a
+			// warning, we return true;
+		}
+	}
+
+	@Override
 	public <T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer) {
 		if (messageConsumerList.containsKey(messageClass)) {
 			logger.warn("Consumer for class {} already registered and will be overwritten!", messageClass);
@@ -102,6 +116,11 @@ public class XmppIcarusSession implements IIcarusSession {
 		} else {
 			logger.warn("Not connected, can't send File");
 		}
+	}
+	
+	@Override
+	public List<String> getAllOtherUsers() {
+		return xmppManager.getAllOtherUsers();
 	}
 
 	@Override
@@ -129,15 +148,6 @@ public class XmppIcarusSession implements IIcarusSession {
 	@Override
 	public String getServer() {
 		return SERVER;
-	}
-
-	@Override
-	public void sendMessageToUser(IMessageObject message, String name) {
-		try {
-			xmppManager.sendMessage(message.toString(), name);
-		} catch (XmppStringprepException | NotConnectedException | XMPPException | InterruptedException e) {
-			logger.error("Error sending provate message to " + name, e);
-		}
 	}
 
 }

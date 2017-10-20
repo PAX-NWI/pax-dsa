@@ -1,6 +1,7 @@
 package de.pax.dsa.connection;
 
 import java.io.File;
+import java.util.List;
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.IMessageObject;
@@ -23,9 +24,11 @@ public interface IIcarusSession {
 
 	void onUserEntered(Consumer<String> onUserEnteredConsumer);
 
-	void sendMessageToUser(IMessageObject message, String name);
+	boolean sendMessageToUser(IMessageObject message, String name);
 
 	<T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer);
+
+	List<String> getAllOtherUsers();
 
 }
  

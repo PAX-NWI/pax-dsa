@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.ui.internal.GameTable;
+import de.pax.dsa.ui.internal.GameTableElements;
+import de.pax.dsa.ui.internal.contextmenus.NodeContextMenuBuilder;
+import de.pax.dsa.ui.internal.contextmenus.PaneContextMenuBuilder;
 import de.pax.dsa.ui.logindialog.LoginDialogController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -45,13 +48,12 @@ public class RootPaneController {
 	@PostConstruct
 	private void postConstruct() {
 
+		//setup the context, order is important!
 		context.set(Pane.class, mapPane);
-		
+		context.createAndSet(GameTableElements.class);
+		context.createAndSet(NodeContextMenuBuilder.class);
+		context.create(PaneContextMenuBuilder.class);
 		gameTable = context.create(GameTable.class);
-
-//		doMovesButton.setOnAction(e -> {
-//			gameTable.doMoves();
-//		});
 		
 		primaryStage.setTitle("offline");
 	}
@@ -64,7 +66,7 @@ public class RootPaneController {
 		try {
 			page = loader.load();
 		} catch (IOException e) {
-			logger.error(e.getMessage());
+			logger.error("Could not load LoginDialog.fxml", e);
 		}
 		// Create the dialog Stage.
 		Stage dialogStage = new Stage();
@@ -76,11 +78,13 @@ public class RootPaneController {
 		
 		LoginDialogController controller = loader.getController();
 		controller.setStage(dialogStage);
-		controller.onLogin(info -> session.connect(info.getUserName(), info.getPassword()));
+		controller.onLogin(info -> {
+			session.connect(info.getUserName(), info.getPassword());
+			primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
+		});
 		
 		dialogStage.showAndWait();
 		
-		primaryStage.setTitle(session.getUserName() +"@"+ session.getServer());
 	}
 	
 	@FXML

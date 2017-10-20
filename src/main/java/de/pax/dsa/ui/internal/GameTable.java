@@ -1,6 +1,7 @@
 package de.pax.dsa.ui.internal;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -9,7 +10,6 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 
 import de.pax.dsa.connection.IIcarusSession;
-import de.pax.dsa.di.Context;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementMovedMessage;
@@ -21,7 +21,6 @@ import de.pax.dsa.model.messages.RequestFileMessage;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.animations.RotateTransition;
 import de.pax.dsa.ui.internal.contextmenus.NodeContextMenuBuilder;
-import de.pax.dsa.ui.internal.contextmenus.PaneContextMenuBuilder;
 import de.pax.dsa.ui.internal.dragsupport.DragEnabler;
 import de.pax.dsa.ui.internal.dragsupport.I2DObject;
 import de.pax.dsa.ui.internal.dragsupport.IdBuilder;
@@ -60,17 +59,14 @@ public class GameTable {
 	private Logger logger;
 
 	@Inject
-	private Context context;
-
 	private GameTableElements gameTableElements;
+	
+	@Inject
 	private NodeContextMenuBuilder nodeContextMenuBuilder;
 
 	@PostConstruct
 	private void postConstruct() {
 
-		gameTableElements = context.createAndSet(GameTableElements.class);
-		nodeContextMenuBuilder = context.createAndSet(NodeContextMenuBuilder.class);
-		context.create(PaneContextMenuBuilder.class);
 
 		Canvas grid = GridFactory.createGrid(50);
 		grid.setStyle("-fx-background-color: cornsilk;");
@@ -131,8 +127,30 @@ public class GameTable {
 				String name = IdBuilder.getName(id);
 				ImageNode imageNode = null;
 				if (!new File(IMAGE_FOLDER + name).exists()) {
+					// TODO
+					// if a user that added images to the gametable already left
+					// and a new user enters this doesn't work
+					//
+					// but when a user adds a new image to the table he is the
+					// only one that can send it
 					String owner = IdBuilder.getOwner(id);
-					session.sendMessage(new RequestFileMessage(owner, name));
+					// old way: ask all
+					// session.sendMessage(new RequestFileMessage(owner, name));
+
+					// new way: ask user directly, make sure he exists
+					boolean fileRequestSent = session.sendMessageToUser(new RequestFileMessage(owner, name), owner);
+
+					if (!fileRequestSent) {
+						List<String> allOtherUsers = session.getAllOtherUsers();
+						Collections.shuffle(allOtherUsers);
+						for (String user : allOtherUsers) {
+							sleep(500);
+							if (session.sendMessageToUser(new RequestFileMessage(user, name), user)) {
+								break;
+							}
+						}
+					}
+
 					// TODO display a rect with the size of the image to be
 					// received and place the waiting gif in the middle of it
 					imageNode = new ImageNode(id, "waiting.gif", message.getX(), message.getY());
@@ -166,6 +184,8 @@ public class GameTable {
 
 		session.onMessageReceived(RequestFileMessage.class, message -> {
 			// if the owner of the file is me i have to send it
+			// since this usually happens directly after an image is added, only
+			// the user who added it on the gametable has the file
 			if (message.getOwner().equals(session.getUserName())) {
 				session.sendFile(message.getSender(), new File(IMAGE_FOLDER + message.getFileName()));
 			}
@@ -180,6 +200,10 @@ public class GameTable {
 
 		session.onUserEntered(name -> {
 			List<Node> my = gameTableElements.getOwnedBy(session.getUserName());
+			// TODO what happens with elements from a user that has left the
+			// session?
+			// find a better way to determine the users that send the elements
+			// to a new one
 			for (Node node : my) {
 				if (node instanceof Circle) {
 					MoveableCircle circle = (MoveableCircle) node;

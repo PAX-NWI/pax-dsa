@@ -75,6 +75,8 @@ public class XmppManager {
 
 	private Consumer<String> onUserEnteredConsumer;
 
+	private Roster roster;
+
 	public XmppManager(String server, String username, String password, IUiSynchronize uiSynchronize)
 			throws XMPPException, IOException, InterruptedException, SmackException {
 		this.server = server;
@@ -95,7 +97,7 @@ public class XmppManager {
 		connection.login();
 		logger.debug("Authenticated: {}", connection.isAuthenticated());
 
-		Roster roster = Roster.getInstanceFor(connection);
+		roster = Roster.getInstanceFor(connection);
 		roster.setSubscriptionMode(SubscriptionMode.accept_all);
 
 		EntityBareJid room = JidCreate.entityBareFrom(ROOM_NAME + ROOM_PROVIDER);
@@ -112,10 +114,10 @@ public class XmppManager {
 
 			@Override
 			public void joined(EntityFullJid participant) {
+				logger.info("New User entered: " + participant.getResourcepart());
 				if (onUserEnteredConsumer != null) {
-					logger.info("New User entered: " + participant.getResourcepart());
-					uiSynchronize.run(
-							() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
+					uiSynchronize
+							.run(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
 				}
 			}
 
@@ -204,16 +206,43 @@ public class XmppManager {
 		chatManager.addIncomingListener((from, message, chat) -> messageListener.processMessage(message));
 	}
 
-	public void sendMessage(String message, String buddyJID)
-			throws XMPPException, XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
+	public void sendMessage(String message) {
+		logger.debug("Sending mesage '{}' to chat.", message);
+		try {
+			multiUserChat.sendMessage(message);
+		} catch (NotConnectedException | InterruptedException e) {
+			logger.error("Can not send Message to Chat", e);
+		}
+	}
+
+	public boolean sendMessage(String message, String buddyJID) {
 		logger.debug("Sending mesage '{}' to user {}", message, buddyJID);
 
-		EntityBareJid jid = JidCreate.entityBareFrom(buddyJID + "@" + server);
+		EntityBareJid jid = null;
+		try {
+			jid = JidCreate.entityBareFrom(buddyJID + "@" + server);
+		} catch (XmppStringprepException e) {
+			logger.error("Can not send message to user " + buddyJID + ", username may contain illegal chars.", e);
+			return false;
+		}
+
+		if (!roster.getPresence(jid).isAvailable()) {
+			logger.warn("User {} is offline, can not send Message.", jid);
+			return false;
+		}
+
 		Chat chat = chatManager.chatWith(jid);
-		chat.send(message);
+		try {
+			chat.send(message);
+			return true;
+		} catch (NotConnectedException | InterruptedException e) {
+			logger.error("Error sending message to user " + jid, e);
+			return false;
+		}
 	}
 
 	public void sendFile(String buddyJID, File file) {
+		logger.debug("Sending file '{}' to user {}", file.getName(), buddyJID);
 		EntityFullJid jid = null;
 		try {
 			jid = JidCreate.entityFullFrom(buddyJID + "@" + server + "/IcarusClient");
@@ -229,12 +258,4 @@ public class XmppManager {
 
 	}
 
-	public void sendMessage(String message) {
-		try {
-			multiUserChat.sendMessage(message);
-		} catch (NotConnectedException | InterruptedException e) {
-			logger.error("Can not send Message to Chat", e);
-		}
-
-	}
 }
