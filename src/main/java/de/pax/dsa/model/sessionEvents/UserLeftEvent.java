@@ -1,10 +1,10 @@
 package de.pax.dsa.model.sessionEvents;
 
-public class UserJoinedEvent implements ISessionEvent {
+public class UserLeftEvent implements ISessionEvent {
 
 	private String name;
 
-	public UserJoinedEvent(String name) {
+	public UserLeftEvent(String name) {
 		this.name = name;
 	}
 

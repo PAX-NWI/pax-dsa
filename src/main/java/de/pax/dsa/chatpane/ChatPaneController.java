@@ -5,6 +5,8 @@ import javax.inject.Inject;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.messages.TextMessage;
+import de.pax.dsa.model.sessionEvents.SessionConnectedEvent;
+import de.pax.dsa.model.sessionEvents.UserJoinedEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -46,16 +48,16 @@ public class ChatPaneController {
 			}
 		});
 
-		session.onSessionConnected(this::sessionConnected);
+		session.onSessionEvent(SessionConnectedEvent.class, this::sessionConnected);
 	}
 
-	private void sessionConnected(Boolean connected) {
-		if (connected) {
+	private void sessionConnected(SessionConnectedEvent connectedEvent) {
+		if (connectedEvent.isConnected()) {
 			ObservableList<String> items = listView.getItems();
 
 			items.setAll(session.getAllOtherUsers());
 
-			session.onUserEntered(userName -> {
+			session.onSessionEvent(UserJoinedEvent.class, joinedEvent -> {
 				items.setAll(session.getAllOtherUsers());
 			});
 

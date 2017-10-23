@@ -21,6 +21,7 @@ import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.IMessageObject;
 import de.pax.dsa.model.sessionEvents.ISessionEvent;
+import de.pax.dsa.model.sessionEvents.SessionConnectedEvent;
 
 /**
  * Created by swinter on 22.04.2017.
@@ -32,21 +33,15 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private String user = "notConnected";
 
-	private Consumer<File> onFileReceivedConsumer;
-
 	private Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
 
-	private Map<Class<?>, Consumer<?>> sessionEventConsumerList = new HashMap<>();
-
-	private List<Consumer<String>> onUserEnteredConsumers;
+	private Map<Class<ISessionEvent>, List<Consumer<ISessionEvent>>> sessionEventConsumerList = new HashMap<>();
 
 	@Inject
 	private Logger logger;
 
 	@Inject
 	private IUiSynchronize uiSynchronize;
-
-	private Consumer<Boolean> onSessionConnectedConsumer;
 
 	@Override
 	public void connect(String user, String password) {
@@ -58,13 +53,10 @@ public class XmppIcarusSession implements IIcarusSession {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
 		xmppManager.addMessageListener(this::processMessage);
-		
+
 		xmppManager.addSessionEventListener(this::processSessionEvent);
 
-		xmppManager.onFileReceived(onFileReceivedConsumer);
-		xmppManager.onUserEntered(onUserEnteredConsumers);
-
-		onSessionConnectedConsumer.accept(true);
+		processSessionEvent(new SessionConnectedEvent(true));
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -86,9 +78,16 @@ public class XmppIcarusSession implements IIcarusSession {
 			}
 		});
 	}
-	
+
 	private void processSessionEvent(ISessionEvent event) {
-		
+		uiSynchronize.run(() -> {
+			List<Consumer<ISessionEvent>> list = sessionEventConsumerList.get(event.getClass());
+			if (list != null)
+				for (Consumer<ISessionEvent> consumer : list) {
+					consumer.accept(event);
+				}
+		});
+
 	}
 
 	@Override
@@ -123,11 +122,13 @@ public class XmppIcarusSession implements IIcarusSession {
 		messageConsumerList.put(messageClass, consumer);
 	}
 
-	public <T> void onSessionEvent(Class<T> sessionEventClass, Consumer<T> consumer) {
-		if (messageConsumerList.containsKey(sessionEventClass)) {
-			logger.warn("Consumer for class {} already registered and will be overwritten!", sessionEventClass);
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends ISessionEvent> void onSessionEvent(Class<T> sessionEventClass, Consumer<T> consumer) {
+		if (!sessionEventConsumerList.containsKey(sessionEventClass)) {
+			sessionEventConsumerList.put((Class<ISessionEvent>) sessionEventClass, new ArrayList<>());
 		}
-		sessionEventConsumerList.put(sessionEventClass, consumer);
+		sessionEventConsumerList.get(sessionEventClass).add((Consumer<ISessionEvent>) consumer);
 	}
 
 	@Override
@@ -148,24 +149,6 @@ public class XmppIcarusSession implements IIcarusSession {
 			return new ArrayList<>();
 		}
 
-	}
-
-	@Override
-	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
-		this.onFileReceivedConsumer = onFileReceivedConsumer;
-	}
-
-	@Override
-	public void onSessionConnected(Consumer<Boolean> onSessionConnectedConsumer) {
-		this.onSessionConnectedConsumer = onSessionConnectedConsumer;
-	}
-
-	@Override
-	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
-		if (onUserEnteredConsumers == null) {
-			onUserEnteredConsumers = new ArrayList<>();
-		}
-		onUserEnteredConsumers.add(onUserEnteredConsumer);
 	}
 
 	@Override

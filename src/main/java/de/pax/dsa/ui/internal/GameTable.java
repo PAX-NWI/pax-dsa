@@ -18,6 +18,8 @@ import de.pax.dsa.model.messages.ElementRotatedMessage;
 import de.pax.dsa.model.messages.ElementToBackMessage;
 import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
+import de.pax.dsa.model.sessionEvents.FileReceivedEvent;
+import de.pax.dsa.model.sessionEvents.UserJoinedEvent;
 import de.pax.dsa.ui.internal.animations.Move2DTransition;
 import de.pax.dsa.ui.internal.animations.RotateTransition;
 import de.pax.dsa.ui.internal.contextmenus.NodeContextMenuBuilder;
@@ -191,14 +193,15 @@ public class GameTable {
 			}
 		});
 
-		session.onFileReceived(file -> {
-			List<Node> byFilename = gameTableElements.getByFilename(file.getName());
+		session.onSessionEvent(FileReceivedEvent.class, event -> {
+			List<Node> byFilename = gameTableElements.getByFilename(event.getFile().getName());
 			for (Node node : byFilename) {
-				((ImageNode) node).setImage(new Image(FILE + IMAGE_FOLDER + file.getName()));
+				((ImageNode) node).setImage(new Image(FILE + IMAGE_FOLDER + event.getFile().getName()));
 			}
 		});
 
-		session.onUserEntered(name -> {
+		session.onSessionEvent(UserJoinedEvent.class, event -> {
+			String joinedUser = event.getName();
 			List<Node> my = gameTableElements.getOwnedBy(session.getUserName());
 			// TODO what happens with elements from a user that has left the
 			// session?
@@ -208,16 +211,16 @@ public class GameTable {
 				if (node instanceof Circle) {
 					MoveableCircle circle = (MoveableCircle) node;
 					session.sendMessageToUser(new ElementAddedMessage(circle.getId(), ElementType.CIRCLE, circle.getX(),
-							circle.getY(), circle.getRadius(), circle.getRadius()), name);
+							circle.getY(), circle.getRadius(), circle.getRadius()), joinedUser);
 				} else if (node instanceof ImageNode) {
 					ImageNode imageNode = (ImageNode) node;
 					session.sendMessageToUser(new ElementAddedMessage(imageNode.getId(), ElementType.IMAGE,
-							imageNode.getX(), imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()), name);
+							imageNode.getX(), imageNode.getY(), imageNode.getWidth(), imageNode.getHeight()), joinedUser);
 				}
 				sleep(500);
 
 				if (node.getRotate() != 0) {
-					session.sendMessageToUser(new ElementRotatedMessage(node.getId(), (int) node.getRotate()), name);
+					session.sendMessageToUser(new ElementRotatedMessage(node.getId(), (int) node.getRotate()), joinedUser);
 					sleep(500);
 				}
 

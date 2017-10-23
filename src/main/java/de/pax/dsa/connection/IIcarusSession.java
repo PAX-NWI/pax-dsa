@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import de.pax.dsa.model.messages.IMessageObject;
+import de.pax.dsa.model.sessionEvents.ISessionEvent;
 
 public interface IIcarusSession {
 
@@ -15,22 +16,17 @@ public interface IIcarusSession {
 	String getUserName();
 
 	String getServer();
-
-	void onFileReceived(Consumer<File> onFileReceivedConsumer);
+	
+	List<String> getAllOtherUsers();
 
 	void sendFile(String buddyJID, File file);
 
 	void sendMessage(IMessageObject message);
 
-	void onUserEntered(Consumer<String> onUserEnteredConsumer);
-
 	boolean sendMessageToUser(IMessageObject message, String name);
 
 	<T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer);
 
-	List<String> getAllOtherUsers();
-
-	void onSessionConnected(Consumer<Boolean> onSessionConnectedConsumer);
-
+	<T extends ISessionEvent> void onSessionEvent(Class<T> sessionEventClass, Consumer<T> consumer);
 }
  

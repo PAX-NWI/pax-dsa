@@ -2,7 +2,6 @@ package de.pax.dsa.xmpp;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -10,10 +9,8 @@ import java.util.stream.Collectors;
 import org.jivesoftware.smack.AbstractXMPPConnection;
 import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.SmackException;
-import org.jivesoftware.smack.SmackException.NoResponseException;
 import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException;
-import org.jivesoftware.smack.XMPPException.XMPPErrorException;
 import org.jivesoftware.smack.chat2.Chat;
 import org.jivesoftware.smack.chat2.ChatManager;
 import org.jivesoftware.smack.roster.Roster;
@@ -29,7 +26,6 @@ import org.jivesoftware.smackx.muc.DefaultParticipantStatusListener;
 import org.jivesoftware.smackx.muc.MucEnterConfiguration;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
-import org.jivesoftware.smackx.muc.Occupant;
 import org.jxmpp.jid.EntityBareJid;
 import org.jxmpp.jid.EntityFullJid;
 import org.jxmpp.jid.impl.JidCreate;
@@ -39,7 +35,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.di.IUiSynchronize;
+import de.pax.dsa.model.sessionEvents.FileReceivedEvent;
 import de.pax.dsa.model.sessionEvents.ISessionEvent;
+import de.pax.dsa.model.sessionEvents.UserJoinedEvent;
+import de.pax.dsa.model.sessionEvents.UserLeftEvent;
 
 /**
  * Smack Documentation:
@@ -71,10 +70,6 @@ public class XmppManager {
 	private MultiUserChat multiUserChat;
 
 	private FileTransferManager fileTransferManager;
-
-	private Consumer<File> onFileReceivedConsumer;
-
-	private List<Consumer<String>> onUserEnteredConsumers;
 
 	private Roster roster;
 
@@ -111,38 +106,6 @@ public class XmppManager {
 
 		multiUserChat.join(enterConfig.build());
 
-	
-
-		fileTransferManager = FileTransferManager.getInstanceFor(connection);
-
-		fileTransferManager.addFileTransferListener(request -> {
-			try {
-				if (shouldAccept(request)) {
-					IncomingFileTransfer transfer = request.accept();
-					File file = new File(FOLDER + transfer.getFileName());
-					transfer.recieveFile(file);
-					while (!transfer.isDone()) {
-						if (transfer.getStatus().equals(Status.error)) {
-							logger.error("Error receiving file: " + transfer.getError());
-						} else {
-							logger.info(transfer.getStatus() + " - " + transfer.getProgress());
-						}
-						sleep(1000);
-					}
-
-					if (onFileReceivedConsumer != null) {
-						uiSynchronize.run(() -> onFileReceivedConsumer.accept(file));
-					}
-
-				} else {
-					logger.warn("Rejecting file");
-					request.reject();
-				}
-			} catch (SmackException | IOException | InterruptedException e) {
-				logger.error("Error receiving file", e);
-			}
-		});
-
 		chatManager = ChatManager.getInstanceFor(connection);
 	}
 
@@ -156,24 +119,14 @@ public class XmppManager {
 	}
 
 	public List<String> getAllOtherUsers() {
-		try {
-			List<Occupant> participants = multiUserChat.getParticipants();
-			return participants.stream()//
-					.filter(p -> !p.getNick().equals(multiUserChat.getNickname()))//
-					.map(p -> String.valueOf(p.getNick()))//
-					.collect(Collectors.toList());
-		} catch (NoResponseException | XMPPErrorException | NotConnectedException | InterruptedException e) {
-			logger.error("Could not get all user from chat", e);
-			return new ArrayList<>();
-		}
-	}
 
-	public void onUserEntered(List<Consumer<String>> onUserEnteredConsumers) {
-		this.onUserEnteredConsumers = onUserEnteredConsumers;
-	}
+		List<EntityFullJid> participants = multiUserChat.getOccupants();
 
-	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
-		this.onFileReceivedConsumer = onFileReceivedConsumer;
+		return participants.stream()//
+				.filter(p -> !p.getResourceOrThrow().equals(multiUserChat.getNickname()))//
+				.map(p -> String.valueOf(p.getResourceOrThrow()))//
+				.collect(Collectors.toList());
+
 	}
 
 	protected boolean shouldAccept(FileTransferRequest request) {
@@ -191,12 +144,50 @@ public class XmppManager {
 		multiUserChat.addMessageListener(messageListener);
 		chatManager.addIncomingListener((from, message, chat) -> messageListener.processMessage(message));
 	}
-	
-	public <T> void addSessionEventListener(Consumer<ISessionEvent> sessionEventConsumer) {
-		//TODO
-		
-	}
 
+	public <T> void addSessionEventListener(Consumer<ISessionEvent> sessionEventConsumer) {
+		multiUserChat.addParticipantStatusListener(new DefaultParticipantStatusListener() {
+			@Override
+			public void joined(EntityFullJid participant) {
+				logger.debug("New User entered: " + participant.getResourcepart());
+				sessionEventConsumer.accept(new UserJoinedEvent(String.valueOf(participant.getResourcepart())));
+			}
+
+			@Override
+			public void left(EntityFullJid participant) {
+				logger.debug("User left: " + participant.getResourcepart());
+				sessionEventConsumer.accept(new UserLeftEvent(String.valueOf(participant.getResourcepart())));
+			}
+		});
+
+		fileTransferManager = FileTransferManager.getInstanceFor(connection);
+
+		fileTransferManager.addFileTransferListener(request -> {
+			try {
+				if (shouldAccept(request)) {
+					IncomingFileTransfer transfer = request.accept();
+					File file = new File(FOLDER + transfer.getFileName());
+					transfer.recieveFile(file);
+					while (!transfer.isDone()) {
+						if (transfer.getStatus().equals(Status.error)) {
+							logger.error("Error receiving file: " + transfer.getError());
+						} else {
+							logger.debug(transfer.getStatus() + " - " + transfer.getProgress());
+						}
+						sleep(1000);
+					}
+					sessionEventConsumer.accept(new FileReceivedEvent(file));
+
+				} else {
+					logger.warn("Rejecting file");
+					request.reject();
+				}
+			} catch (SmackException | IOException | InterruptedException e) {
+				logger.error("Error receiving file", e);
+			}
+		});
+
+	}
 
 	public void sendMessage(String message) {
 		logger.debug("Sending mesage '{}' to chat.", message);
@@ -249,6 +240,5 @@ public class XmppManager {
 		}
 
 	}
-
 
 }
