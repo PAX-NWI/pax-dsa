@@ -10,6 +10,7 @@ import de.pax.dsa.model.messages.ElementToTopMessage;
 import de.pax.dsa.model.messages.IMessageObject;
 import de.pax.dsa.model.messages.ElementMovedMessage;
 import de.pax.dsa.model.messages.RequestFileMessage;
+import de.pax.dsa.model.messages.TextMessage;
 
 public class MessageConverter {
 
@@ -29,6 +30,8 @@ public class MessageConverter {
 			return new ElementToBackMessage(message, sender);
 		} else if (body.startsWith(ElementRotatedMessage.startsWith())) {
 			return new ElementRotatedMessage(message, sender);
+		}else if (body.startsWith(TextMessage.startsWith())) {
+			return new TextMessage(message, sender);
 		}
 		return null;
 	}

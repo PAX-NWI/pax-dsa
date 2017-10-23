@@ -39,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import de.pax.dsa.di.IUiSynchronize;
+import de.pax.dsa.model.sessionEvents.ISessionEvent;
 
 /**
  * Smack Documentation:
@@ -73,7 +74,7 @@ public class XmppManager {
 
 	private Consumer<File> onFileReceivedConsumer;
 
-	private Consumer<String> onUserEnteredConsumer;
+	private List<Consumer<String>> onUserEnteredConsumers;
 
 	private Roster roster;
 
@@ -110,22 +111,7 @@ public class XmppManager {
 
 		multiUserChat.join(enterConfig.build());
 
-		multiUserChat.addParticipantStatusListener(new DefaultParticipantStatusListener() {
-
-			@Override
-			public void joined(EntityFullJid participant) {
-				logger.info("New User entered: " + participant.getResourcepart());
-				if (onUserEnteredConsumer != null) {
-					uiSynchronize
-							.run(() -> onUserEnteredConsumer.accept(String.valueOf(participant.getResourcepart())));
-				}
-			}
-
-			@Override
-			public void left(EntityFullJid participant) {
-				logger.info("User left: " + participant.getResourcepart());
-			}
-		});
+	
 
 		fileTransferManager = FileTransferManager.getInstanceFor(connection);
 
@@ -182,8 +168,8 @@ public class XmppManager {
 		}
 	}
 
-	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
-		this.onUserEnteredConsumer = onUserEnteredConsumer;
+	public void onUserEntered(List<Consumer<String>> onUserEnteredConsumers) {
+		this.onUserEnteredConsumers = onUserEnteredConsumers;
 	}
 
 	public void onFileReceived(Consumer<File> onFileReceivedConsumer) {
@@ -205,6 +191,12 @@ public class XmppManager {
 		multiUserChat.addMessageListener(messageListener);
 		chatManager.addIncomingListener((from, message, chat) -> messageListener.processMessage(message));
 	}
+	
+	public <T> void addSessionEventListener(Consumer<ISessionEvent> sessionEventConsumer) {
+		//TODO
+		
+	}
+
 
 	public void sendMessage(String message) {
 		logger.debug("Sending mesage '{}' to chat.", message);
@@ -257,5 +249,6 @@ public class XmppManager {
 		}
 
 	}
+
 
 }

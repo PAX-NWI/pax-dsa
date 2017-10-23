@@ -2,6 +2,7 @@ package de.pax.dsa.xmpp;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,6 +20,7 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.model.MessageConverter;
 import de.pax.dsa.model.messages.IMessageObject;
+import de.pax.dsa.model.sessionEvents.ISessionEvent;
 
 /**
  * Created by swinter on 22.04.2017.
@@ -28,19 +30,23 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private XmppManager xmppManager;
 
-	private String user;
+	private String user = "notConnected";
 
 	private Consumer<File> onFileReceivedConsumer;
 
-	Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
+	private Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
 
-	private Consumer<String> onUserEnteredConsumer;
+	private Map<Class<?>, Consumer<?>> sessionEventConsumerList = new HashMap<>();
+
+	private List<Consumer<String>> onUserEnteredConsumers;
 
 	@Inject
 	private Logger logger;
 
 	@Inject
 	private IUiSynchronize uiSynchronize;
+
+	private Consumer<Boolean> onSessionConnectedConsumer;
 
 	@Override
 	public void connect(String user, String password) {
@@ -52,16 +58,20 @@ public class XmppIcarusSession implements IIcarusSession {
 			logger.error("Unable to connect to " + SERVER, e);
 		}
 		xmppManager.addMessageListener(this::processMessage);
+		
+		xmppManager.addSessionEventListener(this::processSessionEvent);
 
 		xmppManager.onFileReceived(onFileReceivedConsumer);
-		xmppManager.onUserEntered(onUserEnteredConsumer);
+		xmppManager.onUserEntered(onUserEnteredConsumers);
+
+		onSessionConnectedConsumer.accept(true);
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void processMessage(Message message) {
 		Resourcepart sender = message.getFrom().getResourceOrThrow();
 		if (sender.toString().equals(user)) {
-			logger.debug("Ignoring message sent by myself: "+message.getBody());
+			logger.debug("Ignoring message sent by myself: " + message.getBody());
 			return;
 		}
 		uiSynchronize.run(() -> {
@@ -75,6 +85,10 @@ public class XmppIcarusSession implements IIcarusSession {
 				logger.warn("No Consumer registered for {}", class1);
 			}
 		});
+	}
+	
+	private void processSessionEvent(ISessionEvent event) {
+		
 	}
 
 	@Override
@@ -109,6 +123,13 @@ public class XmppIcarusSession implements IIcarusSession {
 		messageConsumerList.put(messageClass, consumer);
 	}
 
+	public <T> void onSessionEvent(Class<T> sessionEventClass, Consumer<T> consumer) {
+		if (messageConsumerList.containsKey(sessionEventClass)) {
+			logger.warn("Consumer for class {} already registered and will be overwritten!", sessionEventClass);
+		}
+		sessionEventConsumerList.put(sessionEventClass, consumer);
+	}
+
 	@Override
 	public void sendFile(String buddyJID, File file) {
 		if (xmppManager != null) {
@@ -117,10 +138,16 @@ public class XmppIcarusSession implements IIcarusSession {
 			logger.warn("Not connected, can't send File");
 		}
 	}
-	
+
 	@Override
 	public List<String> getAllOtherUsers() {
-		return xmppManager.getAllOtherUsers();
+		if (xmppManager != null) {
+			return xmppManager.getAllOtherUsers();
+		} else {
+			logger.warn("Not connected, can't get all other users");
+			return new ArrayList<>();
+		}
+
 	}
 
 	@Override
@@ -129,8 +156,16 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
+	public void onSessionConnected(Consumer<Boolean> onSessionConnectedConsumer) {
+		this.onSessionConnectedConsumer = onSessionConnectedConsumer;
+	}
+
+	@Override
 	public void onUserEntered(Consumer<String> onUserEnteredConsumer) {
-		this.onUserEnteredConsumer = onUserEnteredConsumer;
+		if (onUserEnteredConsumers == null) {
+			onUserEnteredConsumers = new ArrayList<>();
+		}
+		onUserEnteredConsumers.add(onUserEnteredConsumer);
 	}
 
 	@Override

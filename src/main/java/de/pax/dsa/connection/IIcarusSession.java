@@ -30,5 +30,7 @@ public interface IIcarusSession {
 
 	List<String> getAllOtherUsers();
 
+	void onSessionConnected(Consumer<Boolean> onSessionConnectedConsumer);
+
 }
  
