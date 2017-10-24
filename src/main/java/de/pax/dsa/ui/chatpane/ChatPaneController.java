@@ -1,4 +1,4 @@
-package de.pax.dsa.chatpane;
+package de.pax.dsa.ui.chatpane;
 
 import javax.annotation.PostConstruct;
 import javax.inject.Inject;

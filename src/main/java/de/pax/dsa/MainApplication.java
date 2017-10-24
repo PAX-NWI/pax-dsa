@@ -3,10 +3,10 @@ package de.pax.dsa;
 import java.io.File;
 import java.io.IOException;
 
-import de.pax.dsa.chatpane.ChatPaneController;
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
 import de.pax.dsa.di.IUiSynchronize;
+import de.pax.dsa.ui.chatpane.ChatPaneController;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import javafx.application.Application;
 import javafx.application.Platform;
