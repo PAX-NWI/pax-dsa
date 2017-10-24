@@ -10,13 +10,13 @@ import de.pax.dsa.model.sessionEvents.ISessionEvent;
 public interface IIcarusSession {
 
 	void connect(String user, String password);
-	
+
 	void disconnect();
 
 	String getUserName();
 
 	String getServer();
-	
+
 	List<String> getAllOtherUsers();
 
 	void sendFile(String buddyJID, File file);
@@ -25,8 +25,7 @@ public interface IIcarusSession {
 
 	boolean sendMessageToUser(IMessageObject message, String name);
 
-	<T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer);
+	<T extends IMessageObject> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer);
 
 	<T extends ISessionEvent> void onSessionEvent(Class<T> sessionEventClass, Consumer<T> consumer);
 }
- 

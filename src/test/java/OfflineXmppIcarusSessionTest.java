@@ -16,6 +16,9 @@ import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
 import de.pax.dsa.model.messages.TextMessage;
+import de.pax.dsa.model.sessionEvents.ISessionEvent;
+import de.pax.dsa.model.sessionEvents.UserJoinedEvent;
+import de.pax.dsa.model.sessionEvents.UserLeftEvent;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import mocks.TestLogger;
 import mocks.Wrapper;
@@ -38,11 +41,11 @@ public class OfflineXmppIcarusSessionTest {
 	public void testWarnOnTwoSameHandler() {
 		Class<ElementRemovedMessage> messageClass = ElementRemovedMessage.class;
 		session.onMessageReceived(messageClass, message -> {
-			//test add first
+			// test add first
 		});
 
 		session.onMessageReceived(messageClass, message -> {
-			//test add second
+			// test add second
 		});
 
 		assertEquals(1, logger.getWarningList().size());
@@ -73,37 +76,36 @@ public class OfflineXmppIcarusSessionTest {
 		assertEquals(elementAddedMessage.toString(), addedMessageReceived.value.toString());
 		assertEquals(elementRemovedMessage.toString(), removedMessageReceived.value.toString());
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessage1() throws Exception {
 		testMessage(new TextMessage(" id seperator --- used in text, and commas , "));
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessage2() throws Exception {
 		testMessage(new TextMessage("[bracets]  [in text]"));
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessage3() throws Exception {
 		testMessage(new TextMessage("equal = signs = inside"));
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessage4() throws Exception {
 		testMessage(new TextMessage("\"quots around \" different \"blocks inside\" "));
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessage5() throws Exception {
 		testMessage(new TextMessage("quote in \" the middle"));
 	}
-	
+
 	@Test
 	public void testSpecialCharacterInTextMessageWild() throws Exception {
 		testMessage(new TextMessage("°^§$%&/()=?²³{[]};,.:<>|=?*+~'#_-\"\"\"\"\\"));
 	}
-
 
 	private void testMessage(TextMessage textMessage) throws Exception, XmppStringprepException {
 		Wrapper<TextMessage> textMessageReceived = new Wrapper<>();
@@ -129,6 +131,28 @@ public class OfflineXmppIcarusSessionTest {
 
 	}
 
+	@Test
+	public void testEvents() throws Exception {
+		UserJoinedEvent userJoinedEvent = new UserJoinedEvent("username");
+		Wrapper<UserJoinedEvent> userJoinedEventReceived = new Wrapper<>();
+		session.onSessionEvent(UserJoinedEvent.class, e -> {
+			userJoinedEventReceived.value = e;
+		});
+
+		UserLeftEvent userLeftEvent = new UserLeftEvent("username");
+		Wrapper<UserLeftEvent> userLeftEventReceived = new Wrapper<>();
+		session.onSessionEvent(UserLeftEvent.class, e -> {
+			userLeftEventReceived.value = e;
+		});
+		
+		simulateProcessEvent(session, userJoinedEvent);
+		simulateProcessEvent(session, userLeftEvent);
+		
+		assertEquals(0, logger.getWarningList().size());
+		assertEquals(userJoinedEvent, userJoinedEventReceived.value);
+		assertEquals(userLeftEvent, userLeftEventReceived.value);
+	}
+
 	private Message stringToTestMessage(String text) throws XmppStringprepException {
 		Message addedMessageSent = new Message("to", text);
 		addedMessageSent.setFrom(JidCreate.from("from@test.de/unitTest"));
@@ -141,6 +165,16 @@ public class OfflineXmppIcarusSessionTest {
 	 */
 	private void simulateProcessMessage(IIcarusSession session, Message message) throws Exception {
 		Method declaredMethod = XmppIcarusSession.class.getDeclaredMethod("processMessage", Message.class);
+		declaredMethod.setAccessible(true);
+		declaredMethod.invoke(session, message);
+	}
+
+	/**
+	 * Using reflection to test the private method "processEvent" without
+	 * connecting to an actual xmpp server
+	 */
+	private void simulateProcessEvent(IIcarusSession session, ISessionEvent message) throws Exception {
+		Method declaredMethod = XmppIcarusSession.class.getDeclaredMethod("processSessionEvent", ISessionEvent.class);
 		declaredMethod.setAccessible(true);
 		declaredMethod.invoke(session, message);
 	}

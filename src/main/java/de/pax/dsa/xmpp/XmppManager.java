@@ -115,18 +115,13 @@ public class XmppManager {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public List<String> getAllOtherUsers() {
-
-		List<EntityFullJid> participants = multiUserChat.getOccupants();
-
-		return participants.stream()//
+		return multiUserChat.getOccupants().stream()//
 				.filter(p -> !p.getResourceOrThrow().equals(multiUserChat.getNickname()))//
 				.map(p -> String.valueOf(p.getResourceOrThrow()))//
 				.collect(Collectors.toList());
-
 	}
 
 	protected boolean shouldAccept(FileTransferRequest request) {
@@ -145,7 +140,7 @@ public class XmppManager {
 		chatManager.addIncomingListener((from, message, chat) -> messageListener.processMessage(message));
 	}
 
-	public <T> void addSessionEventListener(Consumer<ISessionEvent> sessionEventConsumer) {
+	public void addSessionEventListener(Consumer<ISessionEvent> sessionEventConsumer) {
 		multiUserChat.addParticipantStatusListener(new DefaultParticipantStatusListener() {
 			@Override
 			public void joined(EntityFullJid participant) {

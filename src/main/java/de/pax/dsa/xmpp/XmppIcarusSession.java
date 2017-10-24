@@ -33,7 +33,7 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private String user = "notConnected";
 
-	private Map<Class<?>, Consumer<?>> messageConsumerList = new HashMap<>();
+	private Map<Class<? extends IMessageObject>, Consumer<? extends IMessageObject>> messageConsumerList = new HashMap<>();
 
 	private Map<Class<ISessionEvent>, List<Consumer<ISessionEvent>>> sessionEventConsumerList = new HashMap<>();
 
@@ -67,7 +67,7 @@ public class XmppIcarusSession implements IIcarusSession {
 			return;
 		}
 		uiSynchronize.run(() -> {
-			logger.info("Received message:" + message.getBody());
+			logger.debug("Received message:" + message.getBody());
 			Object decode = MessageConverter.decode(message, sender.toString());
 			Class<? extends Object> class1 = decode.getClass();
 			Consumer consumer = messageConsumerList.get(class1);
@@ -81,13 +81,11 @@ public class XmppIcarusSession implements IIcarusSession {
 
 	private void processSessionEvent(ISessionEvent event) {
 		uiSynchronize.run(() -> {
-			List<Consumer<ISessionEvent>> list = sessionEventConsumerList.get(event.getClass());
-			if (list != null)
-				for (Consumer<ISessionEvent> consumer : list) {
-					consumer.accept(event);
-				}
+			List<Consumer<ISessionEvent>> consumers = sessionEventConsumerList.get(event.getClass());
+			if (consumers != null) {
+				consumers.forEach(consumer -> consumer.accept(event));
+			}
 		});
-
 	}
 
 	@Override
@@ -115,7 +113,7 @@ public class XmppIcarusSession implements IIcarusSession {
 	}
 
 	@Override
-	public <T> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer) {
+	public <T extends IMessageObject> void onMessageReceived(Class<T> messageClass, Consumer<T> consumer) {
 		if (messageConsumerList.containsKey(messageClass)) {
 			logger.warn("Consumer for class {} already registered and will be overwritten!", messageClass);
 		}
