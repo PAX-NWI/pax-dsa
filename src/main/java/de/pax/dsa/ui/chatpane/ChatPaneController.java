@@ -7,6 +7,7 @@ import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.model.messages.TextMessage;
 import de.pax.dsa.model.sessionEvents.SessionConnectedEvent;
 import de.pax.dsa.model.sessionEvents.UserJoinedEvent;
+import de.pax.dsa.model.sessionEvents.UserLeftEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -57,7 +58,13 @@ public class ChatPaneController {
 
 			items.setAll(session.getAllOtherUsers());
 
-			session.onSessionEvent(UserJoinedEvent.class, joinedEvent -> {
+			session.onSessionEvent(UserJoinedEvent.class, event -> {
+				chatArea.appendText(event.getName() + " joined");
+				items.setAll(session.getAllOtherUsers());
+			});
+
+			session.onSessionEvent(UserLeftEvent.class, event -> {
+				chatArea.appendText(event.getName() + " left");
 				items.setAll(session.getAllOtherUsers());
 			});
 

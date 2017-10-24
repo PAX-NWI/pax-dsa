@@ -15,6 +15,7 @@ import de.pax.dsa.di.IUiSynchronize;
 import de.pax.dsa.model.ElementType;
 import de.pax.dsa.model.messages.ElementAddedMessage;
 import de.pax.dsa.model.messages.ElementRemovedMessage;
+import de.pax.dsa.model.messages.TextMessage;
 import de.pax.dsa.xmpp.XmppIcarusSession;
 import mocks.TestLogger;
 import mocks.Wrapper;
@@ -71,6 +72,49 @@ public class OfflineXmppIcarusSessionTest {
 		assertEquals(0, logger.getWarningList().size());
 		assertEquals(elementAddedMessage.toString(), addedMessageReceived.value.toString());
 		assertEquals(elementRemovedMessage.toString(), removedMessageReceived.value.toString());
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessage1() throws Exception {
+		testMessage(new TextMessage(" id seperator --- used in text, and commas , "));
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessage2() throws Exception {
+		testMessage(new TextMessage("[bracets]  [in text]"));
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessage3() throws Exception {
+		testMessage(new TextMessage("equal = signs = inside"));
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessage4() throws Exception {
+		testMessage(new TextMessage("\"quots around \" different \"blocks inside\" "));
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessage5() throws Exception {
+		testMessage(new TextMessage("quote in \" the middle"));
+	}
+	
+	@Test
+	public void testSpecialCharacterInTextMessageWild() throws Exception {
+		testMessage(new TextMessage("°^§$%&/()=?²³{[]};,.:<>|=?*+~'#_-\"\"\"\"\\"));
+	}
+
+
+	private void testMessage(TextMessage textMessage) throws Exception, XmppStringprepException {
+		Wrapper<TextMessage> textMessageReceived = new Wrapper<>();
+		session.onMessageReceived(TextMessage.class, message -> {
+			textMessageReceived.value = message;
+		});
+
+		simulateProcessMessage(session, stringToTestMessage(textMessage.toString()));
+
+		assertEquals(0, logger.getWarningList().size());
+		assertEquals(textMessage.toString(), textMessageReceived.value.toString());
 	}
 
 	@Test

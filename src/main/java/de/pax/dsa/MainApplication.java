@@ -1,7 +1,6 @@
 package de.pax.dsa;
 
 import java.io.File;
-import java.io.IOException;
 
 import de.pax.dsa.connection.IIcarusSession;
 import de.pax.dsa.di.Context;
