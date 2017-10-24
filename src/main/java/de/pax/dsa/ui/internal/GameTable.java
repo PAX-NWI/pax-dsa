@@ -1,7 +1,6 @@
 package de.pax.dsa.ui.internal;
 
 import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.PostConstruct;

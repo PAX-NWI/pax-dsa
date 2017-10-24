@@ -59,12 +59,12 @@ public class ChatPaneController {
 			items.setAll(session.getAllOtherUsers());
 
 			session.onSessionEvent(UserJoinedEvent.class, event -> {
-				chatArea.appendText(event.getName() + " joined");
+				chatArea.appendText(event.getName() + " joined\n");
 				items.setAll(session.getAllOtherUsers());
 			});
 
 			session.onSessionEvent(UserLeftEvent.class, event -> {
-				chatArea.appendText(event.getName() + " left");
+				chatArea.appendText(event.getName() + " left\n");
 				items.setAll(session.getAllOtherUsers());
 			});
 
